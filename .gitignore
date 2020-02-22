@@ -1,3 +1,9 @@
+# default input file
+extensions.list
+
+# default output folder
+extensions
+
 #vscode
 .vscode/
 
