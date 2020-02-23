@@ -11,26 +11,28 @@ def __get_lines(file_path: str) -> List[str]:
         return list(filter(lambda x: len(x) > 0, file.read().splitlines()))
 
 
-def __download_single_package(base_directory: str, registry_name: str, package_name: str, package_ext: str, package_getter: Callable) -> None:
+def __download_single_package(base_directory: str, registry_name: str, package_name: str, package_ext: str, package_getter: Callable) -> str:
     (version_name, url) = package_getter(package_name)
-    downloader.download(base_directory, registry_name, package_name, version_name, package_ext, url)
+    return downloader.download(base_directory, registry_name, package_name, version_name, package_ext, url)
 
 
-def __download_packages(base_directory: str, registry_name: str, package_ext: str, package_getter: Callable, package_list_file: str) -> None:
+def __download_packages(base_directory: str, registry_name: str, package_ext: str, package_getter: Callable, package_list_file: str) -> List[str]:
     package_names = [
         (base_directory, registry_name, package_name, package_ext, package_getter)
         for package_name in  __get_lines(package_list_file)
     ]
     with multiprocessing.Pool(16) as pool:
-        pool.starmap(__download_single_package, package_names)
+        downloaded = pool.starmap(__download_single_package, package_names)
+    return downloaded
 
  
 ssl._create_default_https_context = ssl._create_unverified_context
 
 def main() -> None:
     base_directory = './packages'
-    __download_packages(base_directory, 'vscode', 'vsix', vscode.get_extension, 'vscode.list')
-    packager.package(base_directory)
+    downloaded = __download_packages(base_directory, 'vscode', 'vsix', vscode.get_extension, 'vscode.list')
+    # ToDo save to some (file based?) DB all downloaded files and clean downloads
+    packager.package(downloaded)
 
 if __name__ == "__main__":
     main()
