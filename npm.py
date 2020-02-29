@@ -1,0 +1,91 @@
+from typing import List, Callable, Tuple
+import requests
+import urllib.request
+import os
+import multiprocessing
+import itertools
+from semver import max_satisfying
+
+from downloader import download
+
+NPM_REGISTRY_URL = 'https://registry.npmjs.org/'
+SEMVER_X_FLAG = '999999999999999999999999999999'
+
+
+# todo: how to handle versions like 3.x.1 ?
+def _clean_package_version(version: str):
+    if version == '*' or version is None or version == 'latest':
+        return 'latest'
+    else:
+        return version.replace('~', '').replace('^', '')
+
+
+def _get_version_package_payload(package_name: str, version: str) -> dict:
+    response = requests.get(NPM_REGISTRY_URL + package_name)
+    if response.status_code == 404:
+        raise Exception('Module not found {0}:{1}'.format(package_name, version))
+    if response.status_code != 200:
+        raise Exception('Unknown error occurred {0}:{1}'.format(package_name, version))
+    response_payload = response.json()
+    if version == 'latest':
+        version = response_payload['dist-tags']['latest']
+    if version not in response_payload['versions']:
+        satisfied_version = max_satisfying(list(response_payload['versions'].keys()), version, loose=False)
+        if version is None:
+            print('Failed to satisfy {0}:{1}'.format(package_name, version))
+            raise Exception('Version was not found for {0}:{1}'.format(package_name, version))
+        print('instead of {0}:{1} Used {0}:{2}'.format(package_name, version, satisfied_version))
+        version = satisfied_version
+    return response_payload['versions'][version]
+
+
+def _get_deps(package_name: str, version: str) -> List[Tuple[str, str, dict]]:
+    version_response_payload = _get_version_package_payload(package_name, version)
+    deps = []
+    dev_deps = []
+    if 'dependencies' in version_response_payload:
+        deps = [(dep_pkg_name, _clean_package_version(ver)) for dep_pkg_name, ver in version_response_payload['dependencies'].items()]
+    if 'devDependencies' in version_response_payload:
+        dev_deps = [(dev_dep_pkg_name, _clean_package_version(ver)) for dev_dep_pkg_name, ver in version_response_payload['devDependencies'].items()]
+    joined_deps = deps + dev_deps
+    joined_deps = [(pkg_name, ver, _get_version_package_payload(pkg_name, ver)) for pkg_name, ver in joined_deps]
+    return joined_deps
+
+
+def get_packages(packages: List[Tuple[str, str]]):
+    base_directory = './packages'
+    packages = [('express', '4.17.1')]
+    cache = []
+    deps = []
+    # todo: merge two lists
+    for pkg_name, pkg_ver in packages:
+        deps += _get_deps(pkg_name, pkg_ver)
+
+    def is_in_cache_fn(dep):
+        name = dep[0]
+        ver = dep[1]
+        for (cache_pkg_name, cache_ver, _) in cache:
+            if cache_pkg_name == name and cache_ver == ver:
+                print('hit')
+                return True
+        return False
+
+    with multiprocessing.Pool(8) as pool:
+        while len(deps) > 0:
+            sliced_deps = [(x, y) for x, y, z in deps]
+            # deps_of_deps is a 2d array of results
+            deps_of_deps = pool.starmap(_get_deps, sliced_deps)
+            # flatten
+            deps_of_deps = list(itertools.chain(*deps_of_deps))
+            cache += deps
+            deps = list(filter(is_in_cache_fn, deps_of_deps))
+        download_args_tuples = [(base_directory, 'npmjs', pkg_name, pkg_ver, 'tgz', response['dist']['tarball']) for pkg_name, pkg_ver, response in cache]
+        pool.starmap(download, download_args_tuples)
+
+
+def main() -> None:
+    get_packages([])
+
+
+if __name__ == '__main__':
+    main()
