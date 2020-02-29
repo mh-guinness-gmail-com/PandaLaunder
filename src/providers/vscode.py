@@ -35,7 +35,17 @@ def __get_extension_metadata(extension_name: str, vscode_version: str) -> dict:
         raise ValueError(extension_name, vscode_version) from e
 
 
-def get_extension(extension_name: str, vscode_version: str = __get_vscode_latest()) -> dict:
+def _get_extension(extension_name: str, vscode_version: str = __get_vscode_latest()) -> dict:
     metadata = __get_extension_metadata(extension_name, vscode_version)
     version_url = metadata['fallbackAssetUri'] + '/Microsoft.VisualStudio.Services.VSIXPackage'
     return (metadata['version'], version_url)
+
+ssl._create_default_https_context = ssl._create_unverified_context
+
+class Vscode(Provider):
+    __init__(self):
+        self.__super__()
+
+    def provide(products):
+        extentions = [_get_extension(extention) for extention in products]
+        return [url for _, url in extensions], 'vsix', 'vscode'
