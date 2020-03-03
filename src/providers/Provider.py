@@ -1,11 +1,11 @@
-from ABC import ABC, abstractmethod
+from abc import ABC, abstractmethod
 from typing import List, Tuple
 
 
 class Provider(ABC):
-    __init__(self):
+    def __init__(self):
         pass
 
     @abstractmethod
-    def provide(products: List[str]) -> Tuple[List[str], str, str]:
+    def provide(self, products: List[str]) -> Tuple[List[Tuple[str, str, str]], str, str]:
         pass

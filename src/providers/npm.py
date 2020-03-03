@@ -1,4 +1,3 @@
-import lib.providers.Provider as Provider
 from typing import List, Callable, Tuple
 import requests
 import urllib.request
@@ -7,8 +6,7 @@ import multiprocessing
 import itertools
 from semver import max_satisfying
 
-from downloader import download
-
+from src.providers.Provider import Provider
 
 NPM_REGISTRY_URL = 'https://registry.npmjs.org/'
 
@@ -51,11 +49,12 @@ def _get_deps(package_name: str, version: str, should_download_dev_deps=False) -
     joined_deps = [(pkg_name, ver, _get_version_package_payload(pkg_name, ver)) for pkg_name, ver in joined_deps]
     return joined_deps
 
-class Npm(Provider):
-    __init__(self):
-        self.__super__()
 
-    def provide(products):
+class Npm(Provider):
+    def __init__(self):
+        Provider.__init__(self)
+
+    def provide(self, products):
         packages = [(pkg_name, 'latest') for pkg_name in products]
         cache = []
         deps = []
@@ -67,7 +66,7 @@ class Npm(Provider):
             ver = dep[1]
             for (cache_pkg_name, cache_ver, _) in cache:
                 if cache_pkg_name == name and cache_ver == ver:
-                    print('hit {0}:{1}'.format(cache_pkg_name, cache_ver))
+                    print('cache hit {0}:{1}'.format(cache_pkg_name, cache_ver))
                     return True
             return False
 
@@ -80,4 +79,4 @@ class Npm(Provider):
                 deps_of_deps = list(itertools.chain(*deps_of_deps))
                 cache += deps
                 deps = list(filter(is_in_cache_fn, deps_of_deps))
-        return [response['dist']['tarball'] for _, _, response in cache], 'tgz', 'npmjs'
+        return [(cache_pkg_name, cache_ver,response['dist']['tarball']) for cache_pkg_name, cache_ver, response in cache], 'tgz', 'npmjs'
