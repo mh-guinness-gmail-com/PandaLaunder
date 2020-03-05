@@ -8,6 +8,7 @@ from src.providers.Vscode import Vscode
 from src.providers.Npm import Npm
 from src.products_reader import get_lines
 from src.downloader import download
+from src.packager import package
 
 
 def str2bool(v):
@@ -36,7 +37,7 @@ def main() -> None:
         npm = Npm()
         products = get_lines('./npm.list')
         npm_packages_dl_urls, file_ext, registry = npm.provide(products)
-        will_be_downloaded = [(base_directory, registry, pkg_name, pkg_ver, file_ext, pkg_dl_url) for pkg_name, pkg_ver, pkg_dl_url ]
+        will_be_downloaded = [(base_directory, registry, pkg_name, pkg_ver, file_ext, pkg_dl_url) for pkg_name, pkg_ver, pkg_dl_url in npm_packages_dl_urls]
     elif args.vscode:
         vscode = Vscode()
         products = get_lines('./vscode.list')
@@ -46,6 +47,8 @@ def main() -> None:
     with multiprocessing.Pool(8) as pool:
         # deps_of_deps is a 2d array of results
         output_paths = pool.starmap(download, will_be_downloaded)
+        no_none = list(filter(lambda x: x is not None, output_paths))
+        package(no_none)
 
 
 if __name__ == "__main__":
