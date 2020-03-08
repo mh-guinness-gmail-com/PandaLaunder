@@ -35,7 +35,6 @@ def main() -> None:
         resolved_products += [(base_directory, registry, ext_name, ext_ver, file_ext, ext_dl_url) for ext_name, ext_ver, ext_dl_url in vscode_extentions_dl_info ]
 
     with multiprocessing.Pool(8) as pool:
-        # deps_of_deps is a 2d array of results
         output_paths = pool.starmap(download, resolved_products)
         no_none = list(filter(lambda x: x is not None, output_paths))
         package(no_none)
