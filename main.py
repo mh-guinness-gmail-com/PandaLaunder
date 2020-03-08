@@ -22,21 +22,21 @@ args = parser.parse_args()
 
 def main() -> None:
     base_directory = './packages'
-    will_be_downloaded = []
+    resolved_products = []
     if args.npm:
         npm = Npm()
         products = get_lines('./npm.list')
         npm_packages_dl_urls, file_ext, registry = npm.provide(products)
-        will_be_downloaded = [(base_directory, registry, pkg_name, pkg_ver, file_ext, pkg_dl_url) for pkg_name, pkg_ver, pkg_dl_url in npm_packages_dl_urls]
+        resolved_products = [(base_directory, registry, pkg_name, pkg_ver, file_ext, pkg_dl_url) for pkg_name, pkg_ver, pkg_dl_url in npm_packages_dl_urls]
     elif args.vscode:
         vscode = Vscode()
         products = get_lines('./vscode.list')
         vscode_extentions_dl_info, file_ext, registry = vscode.provide(products)
-        will_be_downloaded += [(base_directory, registry, ext_name, ext_ver, file_ext, ext_dl_url) for ext_name, ext_ver, ext_dl_url in vscode_extentions_dl_info ]
+        resolved_products += [(base_directory, registry, ext_name, ext_ver, file_ext, ext_dl_url) for ext_name, ext_ver, ext_dl_url in vscode_extentions_dl_info ]
 
     with multiprocessing.Pool(8) as pool:
         # deps_of_deps is a 2d array of results
-        output_paths = pool.starmap(download, will_be_downloaded)
+        output_paths = pool.starmap(download, resolved_products)
         no_none = list(filter(lambda x: x is not None, output_paths))
         package(no_none)
 
