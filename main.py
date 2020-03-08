@@ -2,6 +2,7 @@ import argparse
 import multiprocessing
 import ssl
 from typing import List, Callable
+from str2bool import str2bool
 
 
 from src.providers.Vscode import Vscode
@@ -9,16 +10,6 @@ from src.providers.Npm import Npm
 from src.products_reader import get_lines
 from src.downloader import download
 from src.packager import package
-
-
-def str2bool(v):
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
 parser = argparse.ArgumentParser(description='CLI tool')
