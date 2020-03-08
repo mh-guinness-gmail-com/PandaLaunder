@@ -18,6 +18,6 @@ def __walkmany(paths: List[str]):
 
 
 def package(paths: List[str], output_path: str = 'output.zip') -> None:
-    with ZipFile(output_path, 'w', compression=ZIP_LZMA) as zip:
+    with ZipFile(output_path, 'w', compression=ZIP_LZMA) as zip_file:
         for file in __walkmany(paths):
-            zip.write(file)
+            zip_file.write(file)

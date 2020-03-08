@@ -1,7 +1,5 @@
-from typing import List, Callable, Tuple
+from typing import List, Tuple
 import requests
-import urllib.request
-import os
 import multiprocessing
 import itertools
 from semver import max_satisfying
@@ -14,8 +12,7 @@ NPM_REGISTRY_URL = 'https://registry.npmjs.org/'
 def _clean_package_version(version: str):
     if version == '*' or version is None or version == 'latest':
         return 'latest'
-    else:
-        return version.replace('~', '').replace('^', '')
+    return version.replace('~', '').replace('^', '')
 
 
 def _get_version_package_payload(package_name: str, version: str) -> dict:
@@ -53,6 +50,8 @@ def _get_deps(package_name: str, version: str, should_download_dev_deps=False) -
 class Npm(Provider):
     def __init__(self):
         Provider.__init__(self)
+        self.file_ext = 'tgz'
+        self.npm_registry_name = 'npmjs'
 
     def provide(self, products):
         packages = [(pkg_name, 'latest') for pkg_name in products]
@@ -79,4 +78,4 @@ class Npm(Provider):
                 deps_of_deps = list(itertools.chain(*deps_of_deps))
                 cache += deps
                 deps = list(filter(is_in_cache_fn, deps_of_deps))
-        return [(cache_pkg_name, cache_ver,response['dist']['tarball']) for cache_pkg_name, cache_ver, response in cache], 'tgz', 'npmjs'
+        return [(cache_pkg_name, cache_ver,response['dist']['tarball']) for cache_pkg_name, cache_ver, response in cache], self.file_ext, self.npm_registry_name
