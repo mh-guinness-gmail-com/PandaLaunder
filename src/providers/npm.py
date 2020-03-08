@@ -19,7 +19,7 @@ def _get_version_package_payload(package_name: str, version: str) -> dict:
     response = requests.get(NPM_REGISTRY_URL + package_name)
     if response.status_code == 404:
         raise Exception('Module not found {0}:{1}'.format(package_name, version))
-    if response.status_code != 200:
+    if response.status_code > 399:
         raise Exception('Unknown error occurred {0}:{1}'.format(package_name, version))
     response_payload = response.json()
     if version == 'latest':
