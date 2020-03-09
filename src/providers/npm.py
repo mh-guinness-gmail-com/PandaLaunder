@@ -2,7 +2,7 @@ from typing import List, Tuple
 import requests
 import multiprocessing
 import itertools
-from semver import max_satisfying
+import semver
 
 from src.providers.Provider import Provider
 
@@ -25,7 +25,7 @@ def _get_version_package_payload(package_name: str, version: str) -> dict:
     if version == 'latest':
         version = response_payload['dist-tags']['latest']
     if version not in response_payload['versions']:
-        satisfied_version = max_satisfying(list(response_payload['versions'].keys()), version, loose=False)
+        satisfied_version = semver.max_satisfying(list(response_payload['versions'].keys()), version, loose=False)
         if version is None:
             raise Exception('Version was not found for {0}:{1}'.format(package_name, version))
         print('Matched {0}@{1} to specific version {2}'.format(package_name, version, satisfied_version))
