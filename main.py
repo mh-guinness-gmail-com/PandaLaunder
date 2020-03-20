@@ -20,6 +20,8 @@ parser.add_argument('--npm', type=str2bool, default=True,
                     help='specify if should download npm packages')
 parser.add_argument('--concurrency', type=int, default=2,
                     help='Number of workers = concurrency * CPU_CORES_COUNT')
+parser.add_argument('--proxy', type=str2bool, default=False,
+                    help='Turn on if you use a proxy')
 args = parser.parse_args()
 
 
@@ -27,6 +29,8 @@ def main() -> None:
     base_directory = './packages'
     resolved_products = []
     num_workers = args.concurrency * os.cpu_count()
+    if args.proxy:
+        ssl._create_default_https_context = ssl._create_unverified_context
     if args.npm:
         npm = Npm()
         products = get_lines('./npm.list')
@@ -40,7 +44,7 @@ def main() -> None:
 
     with multiprocessing.Pool(num_workers) as pool:
         output_paths = pool.starmap(download, resolved_products)
-        no_none = list(filter(lambda x: x is not None, output_paths))
+        no_none = [path for path in output_paths if path]
         package(no_none)
 
 

@@ -10,12 +10,6 @@ from src.providers.Provider import Provider
 NPM_REGISTRY_URL = 'https://registry.npmjs.org/'
 
 
-def _clean_package_version(version: str):
-    if version == '*' or version is None or version == 'latest':
-        return 'latest'
-    return version.replace('~', '').replace('^', '')
-
-
 def _get_version_package_payload(package_name: str, version: str) -> dict:
     response = requests.get(NPM_REGISTRY_URL + package_name)
     if response.status_code == 404:
@@ -41,7 +35,7 @@ def _get_deps(package_name: str, version: str, should_download_dev_deps=False) -
         deps += version_response_payload['dependencies'].items()
     if should_download_dev_deps and 'devDependencies' in version_response_payload:
         deps += version_response_payload['devDependencies'].items()
-    return [(pkg_name, ver, _get_version_package_payload(pkg_name, _clean_package_version(ver))) for pkg_name, ver in deps]
+    return [(pkg_name, ver, _get_version_package_payload(pkg_name, ver)) for pkg_name, ver in deps]
 
 
 class Npm(Provider):
@@ -74,5 +68,5 @@ class Npm(Provider):
                 # flatten
                 deps_of_deps = list(itertools.chain(*deps_of_deps))
                 cache += deps
-                deps = list(filter(is_in_cache_fn, deps_of_deps))
-        return [(cache_pkg_name, cache_ver,response['dist']['tarball']) for cache_pkg_name, cache_ver, response in cache], self.file_ext, self.npm_registry_name
+                deps = [dep for dep in deps_of_deps if not is_in_cache_fn(dep)]
+        return [(cache_pkg_name, cache_ver, response['dist']['tarball']) for cache_pkg_name, cache_ver, response in cache], self.file_ext, self.npm_registry_name

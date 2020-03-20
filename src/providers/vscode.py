@@ -3,7 +3,6 @@ import requests
 import ssl
 
 from src.providers.Provider import Provider
-ssl._create_default_https_context = ssl._create_unverified_context
 
 
 class Vscode(Provider):
