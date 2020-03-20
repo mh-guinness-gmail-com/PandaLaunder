@@ -1,6 +1,7 @@
 import argparse
 import multiprocessing
 import ssl
+import os
 from typing import List, Callable
 from str2bool import str2bool
 
@@ -17,12 +18,15 @@ parser.add_argument('--vscode', type=str2bool, default=False,
                     help='specify if should download vscode extentions')
 parser.add_argument('--npm', type=str2bool, default=True,
                     help='specify if should download npm packages')
+parser.add_argument('--concurrency', type=int, default=2,
+                    help='Number of workers = concurrency * CPU_CORES_COUNT')
 args = parser.parse_args()
 
 
 def main() -> None:
     base_directory = './packages'
     resolved_products = []
+    num_workers = args.concurrency * os.cpu_count()
     if args.npm:
         npm = Npm()
         products = get_lines('./npm.list')
@@ -34,7 +38,7 @@ def main() -> None:
         vscode_extentions_dl_info, file_ext, registry = vscode.provide(products)
         resolved_products += [(base_directory, registry, ext_name, ext_ver, file_ext, ext_dl_url) for ext_name, ext_ver, ext_dl_url in vscode_extentions_dl_info ]
 
-    with multiprocessing.Pool(8) as pool:
+    with multiprocessing.Pool(num_workers) as pool:
         output_paths = pool.starmap(download, resolved_products)
         no_none = list(filter(lambda x: x is not None, output_paths))
         package(no_none)

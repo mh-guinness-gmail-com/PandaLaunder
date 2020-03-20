@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple
+import os
+
+CPU_COUNT = os.cpu_count()
 
 
 class Provider(ABC):

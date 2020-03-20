@@ -3,6 +3,7 @@ import requests
 import multiprocessing
 import itertools
 import semver
+import os
 
 from src.providers.Provider import Provider
 
@@ -36,14 +37,11 @@ def _get_version_package_payload(package_name: str, version: str) -> dict:
 def _get_deps(package_name: str, version: str, should_download_dev_deps=False) -> List[Tuple[str, str, dict]]:
     version_response_payload = _get_version_package_payload(package_name, version)
     deps = []
-    dev_deps = []
     if 'dependencies' in version_response_payload:
-        deps = [(dep_pkg_name, _clean_package_version(ver)) for dep_pkg_name, ver in version_response_payload['dependencies'].items()]
+        deps += version_response_payload['dependencies'].items()
     if should_download_dev_deps and 'devDependencies' in version_response_payload:
-        dev_deps = [(dev_dep_pkg_name, _clean_package_version(ver)) for dev_dep_pkg_name, ver in version_response_payload['devDependencies'].items()]
-    joined_deps = deps + dev_deps
-    joined_deps = [(pkg_name, ver, _get_version_package_payload(pkg_name, ver)) for pkg_name, ver in joined_deps]
-    return joined_deps
+        deps += version_response_payload['devDependencies'].items()
+    return [(pkg_name, ver, _get_version_package_payload(pkg_name, _clean_package_version(ver))) for pkg_name, ver in deps]
 
 
 class Npm(Provider):
@@ -68,7 +66,7 @@ class Npm(Provider):
                     return True
             return False
 
-        with multiprocessing.Pool(8) as pool:
+        with multiprocessing.Pool(os.cpu_count()) as pool:
             while len(deps) > 0:
                 sliced_deps = [(x, y) for x, y, z in deps]
                 # deps_of_deps is a 2d array of results
