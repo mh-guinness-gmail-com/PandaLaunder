@@ -19,12 +19,11 @@ def _get_version_package_payload(package_name: str, version: str) -> dict:
     response_payload = response.json()
     if version == 'latest':
         version = response_payload['dist-tags']['latest']
-    if version not in response_payload['versions']:
-        satisfied_version = semver.max_satisfying(list(response_payload['versions'].keys()), version, loose=False)
-        if version is None:
-            raise Exception('Version was not found for {0}:{1}'.format(package_name, version))
-        print('Matched {0}@{1} to specific version {2}'.format(package_name, version, satisfied_version))
-        version = satisfied_version
+    satisfied_version = semver.max_satisfying(list(response_payload['versions'].keys()), version, loose=False)
+    if version is None:
+        raise Exception('Version was not found for {0}:{1}'.format(package_name, version))
+    print('Matched {0}@{1} to specific version {2}'.format(package_name, version, satisfied_version))
+    version = satisfied_version
     return response_payload['versions'][version]
 
 
