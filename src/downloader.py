@@ -4,7 +4,7 @@ import urllib.request
 
 def __get_output_file_path(base_dir: str, registry_name: str, package_name: str, version_name: str, package_ext: str) -> str:
     package_dir = os.path.join(base_dir, registry_name, package_name)
-    os.makedirs(package_dir)
+    os.makedirs(package_dir, mode=666, exist_ok=True)
     return os.path.join(package_dir, version_name + '.' + package_ext)
 
 

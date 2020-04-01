@@ -24,17 +24,17 @@ def _get_version_package_payload(package_name: str, version: str) -> dict:
         raise Exception('Version was not found for {0}:{1}'.format(package_name, version))
     print('Matched {0}@{1} to specific version {2}'.format(package_name, version, satisfied_version))
     version = satisfied_version
-    return response_payload['versions'][version]
+    return version, response_payload['versions'][version]
 
 
 def _get_deps(package_name: str, version: str, should_download_dev_deps=False) -> List[Tuple[str, str, dict]]:
-    version_response_payload = _get_version_package_payload(package_name, version)
+    saisfied_version, version_response_payload = _get_version_package_payload(package_name, version)
     deps = []
     if 'dependencies' in version_response_payload:
         deps += version_response_payload['dependencies'].items()
     if should_download_dev_deps and 'devDependencies' in version_response_payload:
         deps += version_response_payload['devDependencies'].items()
-    return [(pkg_name, ver, _get_version_package_payload(pkg_name, ver)) for pkg_name, ver in deps]
+    return [(pkg_name, *(_get_version_package_payload(pkg_name, ver))) for pkg_name, ver in deps]
 
 
 class Npm(Provider):
@@ -47,8 +47,8 @@ class Npm(Provider):
         packages = [(pkg_name, 'latest') for pkg_name in products]
         cache = []
         deps = []
-        for pkg_name, pkg_ver in packages:
-            deps += _get_deps(pkg_name, pkg_ver)
+        for pkg_name, pkg_ver_node_semver in packages:
+            deps += _get_deps(pkg_name, pkg_ver_node_semver)
 
         def is_in_cache_fn(dep):
             name = dep[0]
