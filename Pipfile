@@ -8,6 +8,7 @@ pylint = "*"
 
 [packages]
 requests = "*"
+node-semver = "*"
 
 [requires]
 python_version = "3.8"
