@@ -1,6 +1,7 @@
 import json
-import requests
 import urllib.request
+
+import requests
 
 VSCODE_VERSION_LIST_URL = 'https://code.visualstudio.com/sha'
 EXTENSION_GALLERY_URL = 'https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery'
