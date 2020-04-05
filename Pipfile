@@ -8,10 +8,7 @@ pylint = "*"
 
 [packages]
 requests = "*"
-<<<<<<< HEAD
 node-semver = "*"
-=======
->>>>>>> master
 
 [requires]
 python_version = "3.8"

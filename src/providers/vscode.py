@@ -1,10 +1,13 @@
+import requests
+import json
+
 from src.providers.Provider import Provider
 
 
 class Vscode(Provider):
     def __init__(self):
         """
-         Initalize a vscode extention Provider
+        Initalize a vscode extention Provider
         """
         Provider.__init__(self)
         self.file_ext = 'vsix'
