@@ -13,22 +13,28 @@ NPM_REGISTRY_URL = 'https://registry.npmjs.org/'
 def _get_version_package_payload(package_name: str, version: str) -> dict:
     response = requests.get(NPM_REGISTRY_URL + package_name)
     if response.status_code == 404:
-        raise Exception('Module not found {0}:{1}'.format(package_name, version))
+        raise Exception('Module not found {0}:{1}'.format(
+            package_name, version))
     if response.status_code > 399:
-        raise Exception('Unknown error occurred {0}:{1}'.format(package_name, version))
+        raise Exception('Unknown error occurred {0}:{1}'.format(
+            package_name, version))
     response_payload = response.json()
     if version == 'latest':
         version = response_payload['dist-tags']['latest']
-    satisfied_version = semver.max_satisfying(list(response_payload['versions'].keys()), version, loose=False)
+    satisfied_version = semver.max_satisfying(
+        list(response_payload['versions'].keys()), version, loose=False)
     if version is None:
-        raise Exception('Version was not found for {0}:{1}'.format(package_name, version))
-    print('Matched {0}@{1} to specific version {2}'.format(package_name, version, satisfied_version))
+        raise Exception('Version was not found for {0}:{1}'.format(
+            package_name, version))
+    print('Matched {0}@{1} to specific version {2}'.format(
+        package_name, version, satisfied_version))
     version = satisfied_version
     return version, response_payload['versions'][version]
 
 
 def _get_deps(package_name: str, version: str, should_download_dev_deps=False) -> List[Tuple[str, str, dict]]:
-    _, version_response_payload = _get_version_package_payload(package_name, version)
+    _, version_response_payload = _get_version_package_payload(
+        package_name, version)
     deps = []
     if 'dependencies' in version_response_payload:
         deps += version_response_payload['dependencies'].items()
@@ -39,9 +45,7 @@ def _get_deps(package_name: str, version: str, should_download_dev_deps=False) -
 
 class Npm(Provider):
     def __init__(self):
-        """
-        Initialize an npm package Provider.
-        """
+        """Initialize an npm package Provider."""
         Provider.__init__(self)
         self.file_ext = 'tgz'
         self.npm_registry_name = 'npmjs'
@@ -58,7 +62,8 @@ class Npm(Provider):
             ver = dep[1]
             for (cache_pkg_name, cache_ver, _) in cache:
                 if cache_pkg_name == name and cache_ver == ver:
-                    print('cache hit {0}:{1}'.format(cache_pkg_name, cache_ver))
+                    print('cache hit {0}:{1}'.format(
+                        cache_pkg_name, cache_ver))
                     return True
             return False
 
