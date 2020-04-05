@@ -40,7 +40,7 @@ def _get_deps(package_name: str, version: str, should_download_dev_deps=False) -
 class Npm(Provider):
     def __init__(self):
         """
-        Initialize an npm package Provider
+        Initialize an npm package Provider.
         """
         Provider.__init__(self)
         self.file_ext = 'tgz'
