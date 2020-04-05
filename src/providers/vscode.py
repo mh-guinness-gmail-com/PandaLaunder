@@ -7,7 +7,11 @@ from src.providers.Provider import Provider
 class Vscode(Provider):
     def __init__(self):
         """
+<<<<<<< HEAD
         Initalize a vscode extention Provider.
+=======
+         Initalize a vscode extention Provider
+>>>>>>> fb2cc0031ad2224836bd957c20938422420e13e9
         """
         Provider.__init__(self)
         self.file_ext = 'vsix'
