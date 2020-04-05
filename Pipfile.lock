@@ -1,7 +1,11 @@
 {
     "_meta": {
         "hash": {
+<<<<<<< HEAD
             "sha256": "8f8e5d880ab2b4e9d4e66ae38e1cc40bc1c54ec532e01f05178ae7ae881645e1"
+=======
+            "sha256": "b85f1936a5c2b5f4bc73db63817abd4eb2eaf7bc9f807489ee41666d4652d894"
+>>>>>>> master
         },
         "pipfile-spec": 6,
         "requires": {
@@ -37,6 +41,7 @@
             ],
             "version": "==2.9"
         },
+<<<<<<< HEAD
         "node-semver": {
             "hashes": [
                 "sha256:c6b187ed1f33c844fee130d8bf56879e9dcf17b58af6366fb21068d782e4fa31"
@@ -44,6 +49,8 @@
             "index": "pypi",
             "version": "==0.8.0"
         },
+=======
+>>>>>>> master
         "requests": {
             "hashes": [
                 "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee",
@@ -131,6 +138,7 @@
             ],
             "version": "==1.14.0"
         },
+<<<<<<< HEAD
         "typed-ast": {
             "hashes": [
                 "sha256:0666aa36131496aed8f7be0410ff974562ab7eeac11ef351def9ea6fa28f6355",
@@ -158,6 +166,8 @@
             "markers": "implementation_name == 'cpython' and python_version < '3.8'",
             "version": "==1.4.1"
         },
+=======
+>>>>>>> master
         "wrapt": {
             "hashes": [
                 "sha256:565a021fd19419476b9362b05eeaa094178de64f8361e44468f9e9d7843901e1"
