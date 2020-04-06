@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from src.Product import Product
 from src.Logger import Logger
 
 
-class Provider(ABC):
+class DAL(ABC):
     def __init__(self, logger: Logger):
-        """Interface for a Provider."""
+        """Interface for a DAL."""
         self.__logger = logger
 
     @property
