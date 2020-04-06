@@ -1,55 +1,70 @@
 import requests
 import json
+from typing import List
 
-from src.providers.Provider import Provider
+from . import Provider
+from src.Product import Product
+from src.util import validate_http_status_code
+
+__VERSION_LIST_URL = 'https://code.visualstudio.com/sha'
+__EXTENSION_GALLERY_URL = 'https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery'
+__DOWNLOAD_ENDPOINT = '/Microsoft.VisualStudio.Services.VSIXPackage'
 
 
 class Vscode(Provider):
-    def __init__(self):
-        """Initalize a vscode extention Provider."""
-        Provider.__init__(self)
-        self.file_ext = 'vsix'
-        self.vscode_registry_name = 'vscode'
-        self.VSCODE_VERSION_LIST_URL = 'https://code.visualstudio.com/sha'
-        self.EXTENSION_GALLERY_URL = 'https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery'
-        # 0x200 - only latest; 0x2 - include files
-        self.EXTENSION_GALLERY_SEARCH_FLAGS = 0x200 + 0x2
-
-    def provide(self, products):
-        vscode_version = self.__get_vscode_latest()
-        extensions = [(self._get_extension(extention, vscode_version), extention)
-                      for extention in products]
-        return ([(extention, version, url) for (version, url), extention in extensions], 'vsix', 'vscode')
-
-    def __get_vscode_latest(self, os_arch: str = 'win32-x64', channel: str = 'stable') -> str:
-        response = requests.get(self.VSCODE_VERSION_LIST_URL)
+    @staticmethod
+    def __get_vscode_latest(os_arch: str = 'win32-x64', channel: str = 'stable') -> str:
+        response = requests.get(__VERSION_LIST_URL)
         versions = json.loads(response.text)['products']
-        relevant_versions = [version for version in versions if version['platform']
-                             ['os'] == os_arch and version['build'] == channel]
+        relevant_versions = [
+            version for version in versions
+            if version['platform']['os'] == os_arch and version['build'] == channel
+        ]
         return relevant_versions[0]['name']
 
-    def __get_extension_metadata(self, extension_name: str, vscode_version: str) -> dict:
-        try:
-            headers = {
-                'X-Market-Client-Id': vscode_version,
-                'content-type': 'application/json',
-                'Accept': 'application/json;api-version=3.0-preview.1'
-            }
-            data = {
-                'filters': [{'criteria': [{'filterType': 7, 'value': extension_name}]}],
-                'assetTypes': ['Microsoft.VisualStudio.Services.VSIXPackage'],
-                'flags': self.EXTENSION_GALLERY_SEARCH_FLAGS,
-            }
-            response = requests.post(
-                self.EXTENSION_GALLERY_URL, data=json.dumps(data), headers=headers)
-            results = json.loads(response.text)['results']
-            return results[0]['extensions'][0]['versions'][0]
-        except Exception as e:
-            raise ValueError(extension_name, vscode_version) from e
+    @staticmethod
+    def __generate_extension_gallery_headers(vscode_version) -> dict:
+        return {
+            'X-Market-Client-Id': vscode_version,
+            'content-type': 'application/json',
+            'Accept': 'application/json;api-version=3.0-preview.1',
+        }
 
-    def _get_extension(self, extension_name: str, vscode_version: str) -> dict:
-        metadata = self.__get_extension_metadata(
-            extension_name, vscode_version)
-        version_url = metadata['fallbackAssetUri'] + \
-            '/Microsoft.VisualStudio.Services.VSIXPackage'
-        return (metadata['version'], version_url)
+    @staticmethod
+    def __generate_extension_gallery_body(extension_name: str, extension_version: str) -> dict:
+        return {
+            'filters': [{'criteria': [{'filterType': 7, 'value': extension_name}]}],
+            'assetTypes': ['Microsoft.VisualStudio.Services.VSIXPackage'],
+            'flags': 0x200 + 0x2,  # 0x200 - only latest; 0x2 - include files
+        }
+
+    @property
+    def name(self):
+        return 'vscode'
+
+    @property
+    def file_ext(self):
+        return 'vsix'
+
+    def resolve_product(self, product_name, product_version):
+        if (product_version and product_version != 'latest'):
+            raise NotImplementedError(
+                'Vscode provider currently only supports providing latest version')
+        try:
+            vscode_version = Vscode.__get_vscode_latest()
+            response = requests.post(
+                __EXTENSION_GALLERY_URL,
+                data=json.dumps(Vscode.__generate_extension_gallery_body(
+                    product_name, product_version)),
+                headers=Vscode.__generate_extension_gallery_headers(vscode_version),
+            )
+            validate_http_status_code(response.status_code, self, product_name, product_version)
+            response_payload = response.json()
+
+            extension_latest_md = response_payload['results'][0]['extensions'][0]['versions'][0]
+            version = extension_latest_md['version']
+            download_url = extension_latest_md['fallbackAssetUri'] + __DOWNLOAD_ENDPOINT
+            self.__logger.log('Resolved vscode extension {0} for vscode version {1} to version {2}'.format(product_name, vscode_version, version))
+            return Product(self, product_name, version, download_url)
+        except Exception as e:
+            raise ValueError(product_name, Vscode.__get_vscode_latest()) from e

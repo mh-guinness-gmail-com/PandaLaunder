@@ -1,12 +1,28 @@
 from abc import ABC, abstractmethod
-from typing import List, Tuple
+from typing import List
+
+from src.Product import Product
+from src.Logger import Logger
 
 
 class Provider(ABC):
-    def __init__(self):
+    def __init__(self, logger: Logger):
         """Interface for a Provider."""
-        pass
+        self.__logger = logger
+
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def file_ext(self) -> str:
+        raise NotImplementedError()
 
     @abstractmethod
-    def provide(self, products: List[str]) -> Tuple[List[Tuple[str, str, str]], str, str]:
-        pass
+    def resolve_product(self, product_name: str, product_version: str) -> str:
+        raise NotImplementedError()
+
+    def get_dependencies(self, product: Product) -> List[Product]:
+        return []
