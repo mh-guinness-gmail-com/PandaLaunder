@@ -43,11 +43,13 @@ class Provider(ABC):
                 for product in current_products:
                     if(product.name not in cache):
                         cache[product.name] = []
-                    cache[product.name] += [product.version]
+                    if product.version in cache[product.name]:
+                        current_products.remove(product)
+                    else:
+                        cache[product.name] += [product.version]
 
                 all_products += current_products
-                deps = set(flatten(pool.map(self._get_dependencies, current_products)))
-                resolved_deps = pool.starmap(self._resolve_product, deps)
-                current_products = [
-                    dep for dep in resolved_deps if dep.name not in cache or dep.version not in cache[dep.name]]
+                deps = flatten(
+                    pool.map(self._get_dependencies, current_products))
+                current_products = pool.starmap(self._resolve_product, deps)
         return all_products
