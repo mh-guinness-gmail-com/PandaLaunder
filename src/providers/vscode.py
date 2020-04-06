@@ -4,7 +4,7 @@ from typing import List
 
 from . import Provider
 from src.Product import Product
-from src.util import validate_http_status_code
+from src.http_util import validate_http_status_code
 
 __VERSION_LIST_URL = 'https://code.visualstudio.com/sha'
 __EXTENSION_GALLERY_URL = 'https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery'
@@ -46,7 +46,7 @@ class Vscode(Provider):
     def file_ext(self):
         return 'vsix'
 
-    def resolve_product(self, product_name, product_version):
+    def _resolve_product(self, product_name, product_version):
         if (product_version and product_version != 'latest'):
             raise NotImplementedError(
                 'Vscode provider currently only supports providing latest version')

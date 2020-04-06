@@ -5,6 +5,14 @@ from .. import Product
 
 
 providers = [
-    Npm,
-    Vscode,
+    {
+        'name': 'npm',
+        'products': 'npm packages',
+        'class': Npm,
+    },
+    {
+        'name': 'vscode',
+        'products': 'vscode extensions',
+        'class': Vscode,
+    },
 ]

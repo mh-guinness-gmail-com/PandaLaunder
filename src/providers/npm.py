@@ -7,9 +7,9 @@ import os
 
 from . import Provider
 from src.Product import Product
-from src.util import validate_http_status_code
+from src.http_util import validate_http_status_code
 
-NPM_REGISTRY_URL = 'https://registry.npmjs.org/'
+NPM_REGISTRY_URL = 'https://registry.npmjs.org'
 
 
 class Npm(Provider):
@@ -21,8 +21,8 @@ class Npm(Provider):
     def file_ext(self):
         return 'tgz'
 
-    def resolve_product(self, product_name, product_version):
-        response = requests.get(NPM_REGISTRY_URL + product_name)
+    def _resolve_product(self, product_name, product_version):
+        response = requests.get('{0}/{1}'.format(NPM_REGISTRY_URL, product_name))
         validate_http_status_code(
             response.status_code, self, product_name, product_version)
         response_payload = response.json()
@@ -41,9 +41,8 @@ class Npm(Provider):
         download_url = response_payload['versions'][version]['dist']['tarball']
         return Product(self, product_name, version, download_url)
 
-    def get_dependencies(self, product: Product, *, get_dependencies=True, get_dev_dependencies=False) -> List[tuple(str, str)]:
-        response = requests.get(
-            NPM_REGISTRY_URL + product.name + '/' + product.version)
+    def _get_dependencies(self, product: Product, *, get_dependencies=True, get_dev_dependencies=False) -> List[tuple(str, str)]:
+        response = requests.get('{0}/{1}/{2}'.format(NPM_REGISTRY_URL, product.name, product.version))
         validate_http_status_code(
             response.status_code, self, product.name, product.version)
         response_payload = response.json()
