@@ -5,7 +5,7 @@ import itertools
 import semver
 import os
 
-from . import Provider
+from .Provider import Provider
 from src.Product import Product
 from src.http_util import validate_http_status_code
 
@@ -36,12 +36,12 @@ class Npm(Provider):
 
         all_versions = list(response_payload['versions'].keys())
         version = semver.max_satisfying(all_versions, version, loose=False)
-        self.__logger.log('Resolved npm package {0}@{1} to version {2}'.format(
+        self._logger.log('Resolved npm package {0}@{1} to version {2}'.format(
             product_name, product_version, version))
         download_url = response_payload['versions'][version]['dist']['tarball']
         return Product(self, product_name, version, download_url)
 
-    def _get_dependencies(self, product: Product, *, get_dependencies=True, get_dev_dependencies=False) -> List[tuple(str, str)]:
+    def _get_dependencies(self, product: Product, *, get_dependencies=True, get_dev_dependencies=False) -> List[Tuple[str, str]]:
         response = requests.get('{0}/{1}/{2}'.format(NPM_REGISTRY_URL, product.name, product.version))
         validate_http_status_code(
             response.status_code, self, product.name, product.version)

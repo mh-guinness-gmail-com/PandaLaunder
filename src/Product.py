@@ -10,7 +10,7 @@ class Product:
         self.__download_url = download_url
 
     @property
-    def provider(self) -> str:
+    def provider(self) -> Provider:
         return self.__provider
 
     @property

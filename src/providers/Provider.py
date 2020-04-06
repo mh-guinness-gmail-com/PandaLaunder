@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Tuple
 import multiprocessing
 
 from src.Product import Product
@@ -7,13 +7,13 @@ from src.loggers import Logger
 
 
 def flatten(list_of_lists: List[List[object]]) -> List[object]:
-    return [item in list for list in list_of_lists]
+    return [item for item_list in list_of_lists for item in item_list]
 
 
 class Provider(ABC):
     def __init__(self, logger: Logger):
         """Interface for a Provider."""
-        self.__logger = logger
+        self._logger = logger
 
     @property
     @abstractmethod
@@ -29,10 +29,10 @@ class Provider(ABC):
     def _resolve_product(self, product_name: str, product_version: str) -> str:
         raise NotImplementedError()
 
-    def _get_dependencies(self, product: Product, *, get_dependencies: bool, get_dev_dependencies: bool) -> List[tuple(str, str)]:
+    def _get_dependencies(self, product: Product, *, get_dependencies: bool = True, get_dev_dependencies: bool = False) -> List[Tuple[str, str]]:
         return []
 
-    def provide(self, products: List[tuple(str, str)], concurrency: int = 1) -> List[Product]:
+    def provide(self, products: List[Tuple[str, str]], concurrency: int = 1) -> List[Product]:
         cache = {}
         all_products = []
         current_products = [self._resolve_product(
@@ -41,13 +41,26 @@ class Provider(ABC):
             while len(current_products) > 0:
                 # Update cache
                 for product in current_products:
-                    if(not cache[product.name]):
+                    if(product.name not in cache):
                         cache[product.name] = []
                     cache[product.name] += [product.version]
 
                 all_products += current_products
-                deps = pool.starmap(self._get_dependencies, current_products)
+                deps = pool.map(self._get_dependencies, current_products)
                 resolved_deps = pool.starmap(
                     self._resolve_product, flatten(deps))
                 current_products = [
-                    dep for dep in resolved_deps if dep.version not in cache[dep.name]]
+                    dep for dep in resolved_deps if dep.name not in cache or dep.version not in cache[dep.name]]
+        print('')
+        print('')
+        print('')
+        print('')
+        print('')
+        for product in resolved_products:
+            print('{0}@{1}'.format(product.name, product.version))
+        print('')
+        print('')
+        print('')
+        print('')
+        print('')
+        return all_products

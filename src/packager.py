@@ -19,6 +19,7 @@ def __walkmany(paths: List[str]) -> List[str]:
 
 
 def package(paths: List[str], output_base_path: str) -> str:
+    os.makedirs(output_base_path, exist_ok=True)
     output_path = '{0}/{1}.zip'.format(output_base_path, uuid.uuid4())
     with ZipFile(output_path, 'w', compression=ZIP_LZMA) as zip_file:
         for file in __walkmany(paths):
