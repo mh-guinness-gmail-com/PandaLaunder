@@ -8,6 +8,7 @@ from src.Product import Product
 
 class Downloader:
     def __init__(self, base_dir: str, overwrite: bool = False, *, logger: Logger):
+        """Downloads a single products at a time to a given location."""
         self.__base_dir = base_dir
         self.__overwrite = overwrite
         self.__logger = logger

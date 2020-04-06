@@ -3,7 +3,7 @@ from .providers import Provider
 
 class Product:
     def __init__(self, provider: Provider, name: str, version: str, download_url: str):
-        """A structure that holds a single product"""
+        """A structure that holds a single product."""
         self.__provider = provider
         self.__name = name
         self.__version = version

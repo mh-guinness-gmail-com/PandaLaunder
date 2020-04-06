@@ -1,6 +1,5 @@
 import requests
 import json
-from typing import List
 
 from .Provider import Provider
 from src.Product import Product
