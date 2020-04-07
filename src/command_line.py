@@ -18,7 +18,7 @@ __parser.add_argument('--strict-ssl', type=str2bool, default=True,
 
 for provider in providers:
     __parser.add_argument('--{0}'.format(provider['name']),
-                          type=str2bool,
+                          action='store_true',
                           default=False,
                           help='specify if should download {0}'.format(provider['products']))
 
