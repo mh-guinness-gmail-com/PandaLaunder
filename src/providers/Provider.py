@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import List, Tuple
-from multiprocessing.pool import ThreadPool
+from typing import List, Tuple, Dict
+from threading import Lock, Thread
 from logging import Logger
+from queue import Queue
 
 from src.Product import Product
 
@@ -34,22 +35,39 @@ class Provider(ABC):
 
     def provide(self, products: List[Tuple[str, str]], concurrency: int = 1) -> List[Product]:
         cache = {}
+        cache_lock=Lock()
         all_products = []
-        current_products = [self._resolve_product(
-            name, version) for name, version in products]
-        with ThreadPool(concurrency) as pool:
-            while len(current_products) > 0:
-                # Update cache
-                for product in current_products:
-                    if(product.name not in cache):
-                        cache[product.name] = []
-                    if product.version in cache[product.name]:
-                        current_products.remove(product)
-                    else:
-                        cache[product.name] += [product.version]
+        product_queue = Queue()
 
-                all_products += current_products
-                deps = flatten(
-                    pool.map(self._get_dependencies, current_products))
-                current_products = pool.starmap(self._resolve_product, deps)
+        threads = [Thread(target=self.__provide_worker, args=[product_queue, all_products, cache, cache_lock], daemon=True)for _ in range(concurrency)]
+        for t in threads:
+            t.start()
+        
+        for product in products:
+            product_queue.put(product)
+        
+        # Wait for threads to finish and kill them
+        product_queue.join()
+        for _ in threads:
+            product_queue.put(None)
+        for thread in threads:
+            thread.join()
+
         return all_products
+
+    def __provide_worker(self, product_queue: Queue, result_set: List[Product], cache: Dict[str, List[str]], cache_lock: Lock):
+        for name, version in iter(product_queue.get, None):
+            try:
+                resolved = self._resolve_product(name, version)
+                with cache_lock:
+                    if resolved.name not in cache:
+                        cache[resolved.name] = []
+                    if resolved.version in cache[resolved.name]:
+                        continue
+                    cache[resolved.name].append(resolved.version)
+                result_set.append(resolved)
+                dependencies = self._get_dependencies(resolved)
+                for dependency in dependencies:
+                    product_queue.put(dependency)
+            finally:
+                product_queue.task_done()
