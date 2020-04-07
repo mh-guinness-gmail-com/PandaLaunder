@@ -35,17 +35,18 @@ class Provider(ABC):
 
     def provide(self, products: List[Tuple[str, str]], concurrency: int = 1) -> List[Product]:
         cache = {}
-        cache_lock=Lock()
+        cache_lock = Lock()
         all_products = []
         product_queue = Queue()
 
-        threads = [Thread(target=self.__provide_worker, args=[product_queue, all_products, cache, cache_lock], daemon=True)for _ in range(concurrency)]
+        threads = [Thread(target=self.__provide_worker, args=[
+                          product_queue, all_products, cache, cache_lock], daemon=True)for _ in range(concurrency)]
         for t in threads:
             t.start()
-        
+
         for product in products:
             product_queue.put(product)
-        
+
         # Wait for threads to finish and kill them
         product_queue.join()
         for _ in threads:
