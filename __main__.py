@@ -12,16 +12,19 @@ from src.providers import providers
 
 providers = {provider['name']: provider['class'] for provider in providers}
 
-def get_logger(level = logging.DEBUG):
+
+def get_logger(level=logging.DEBUG):
     logging.basicConfig()
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
     console_handler = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter('%(asctime)s\t|\t%(levelname)s\t|\t%(message)s')
+    formatter = logging.Formatter(
+        '%(asctime)s\t|\t%(levelname)s\t|\t%(message)s')
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
     logger.propagate = False
     return logger
+
 
 def main() -> None:
     logger = get_logger()
@@ -34,9 +37,11 @@ def main() -> None:
     logger.info('Started resolving products')
     for provider_name, value in vars(args).items():
         if provider_name in providers and value == True:
-            logger.info('Started resolving products from provider {0}'.format(provider_name))
+            logger.info(
+                'Started resolving products from provider {0}'.format(provider_name))
             provider = providers[provider_name](logger)
-            product_names = get_lines('{0}/{1}.list'.format(args.input_dir, provider.name))
+            product_names = get_lines(
+                '{0}/{1}.list'.format(args.input_dir, provider.name))
             resolved_products += provider.provide(
                 [(product_name, 'latest') for product_name in product_names])
 
@@ -47,7 +52,8 @@ def main() -> None:
         if len(paths_to_bundle) > 0:
             logger.info('Started packaging')
             package_name = package(paths_to_bundle, args.output_dir)
-            logger.debug('Finished packaging into file {0}'.format(package_name))
+            logger.debug(
+                'Finished packaging into file {0}'.format(package_name))
         else:
             logger.info('No new products - skipping packaging')
 
