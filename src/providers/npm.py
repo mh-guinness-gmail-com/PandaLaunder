@@ -36,7 +36,7 @@ class Npm(Provider):
 
         all_versions = list(response_payload['versions'].keys())
         version = semver.max_satisfying(all_versions, version, loose=False)
-        self._logger.log('Resolved npm package {0}@{1} to version {2}'.format(
+        self._logger.info('Resolved npm package {0}@{1} to version {2}'.format(
             product_name, product_version, version))
         download_url = response_payload['versions'][version]['dist']['tarball']
         return Product(self, product_name, version, download_url)

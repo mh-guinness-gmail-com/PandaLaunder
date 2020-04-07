@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple
-import multiprocessing
+from multiprocessing.pool import ThreadPool
+from logging import Logger
 
 from src.Product import Product
-from src.loggers import Logger
 
 
 def flatten(list_of_lists: List[List[object]]) -> List[object]:
@@ -37,7 +37,7 @@ class Provider(ABC):
         all_products = []
         current_products = [self._resolve_product(
             name, version) for name, version in products]
-        with multiprocessing.Pool(concurrency) as pool:
+        with ThreadPool(concurrency) as pool:
             while len(current_products) > 0:
                 # Update cache
                 for product in current_products:

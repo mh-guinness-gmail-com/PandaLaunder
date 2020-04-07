@@ -63,7 +63,7 @@ class Vscode(Provider):
             extension_latest_md = response_payload['results'][0]['extensions'][0]['versions'][0]
             version = extension_latest_md['version']
             download_url = extension_latest_md['fallbackAssetUri'] + _DOWNLOAD_ENDPOINT
-            self._logger.log('Resolved vscode extension {0} for vscode version {1} to version {2}'.format(product_name, vscode_version, version))
+            self._logger.info('Resolved vscode extension {0} for vscode version {1} to version {2}'.format(product_name, vscode_version, version))
             return Product(self, product_name, version, download_url)
         except Exception as e:
             raise ValueError(product_name, Vscode.__get_vscode_latest()) from e
