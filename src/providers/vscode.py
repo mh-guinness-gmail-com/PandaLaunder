@@ -11,7 +11,6 @@ _DOWNLOAD_ENDPOINT = '/Microsoft.VisualStudio.Services.VSIXPackage'
 
 
 class Vscode(Provider):
-    # provider for VSCode extensions
     @staticmethod
     def __get_vscode_latest(os_arch: str = 'win32-x64', channel: str = 'stable') -> str:
         response = requests.get(_VERSION_LIST_URL)
