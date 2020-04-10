@@ -5,7 +5,7 @@ def validate_http_status_code(status_code: int, provider: Provider, product_name
     message = None
     if status_code == 404:
         message = 'Product not found {0}:{1}'
-    if status_code > 399:
+    elif status_code > 399:
         message = 'Unknown HTTP error occurred {0}:{1}'
 
     if message:

@@ -36,7 +36,7 @@ def main() -> None:
     resolved_products = []
     logger.info('Started resolving products')
     for provider_name, value in vars(args).items():
-        if provider_name in providers and value == True:
+        if provider_name in providers and value:
             logger.info(
                 'Started resolving products from provider {0}'.format(provider_name))
             provider = providers[provider_name](logger)
