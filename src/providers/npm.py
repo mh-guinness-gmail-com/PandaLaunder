@@ -1,9 +1,6 @@
 from typing import List, Tuple
 import requests
-import multiprocessing
-import itertools
 import semver
-import os
 
 from .Provider import Provider
 from src.Product import Product

@@ -29,10 +29,12 @@ class ThreadPool:
             thread.join()
 
     def __enter__(self):
+        """Starts the threads."""
         self.__start_threads()
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        """Stops the threads."""
         self.__stop_threads()
 
     def __worker(self):

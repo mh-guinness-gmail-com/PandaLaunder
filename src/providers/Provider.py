@@ -29,6 +29,7 @@ class Provider(ABC):
     def _resolve_product(self, product_name: str, product_version: str) -> str:
         raise NotImplementedError()
 
+    # pylint: disable=no-self-use
     def _get_dependencies(self, product: Product, *, get_dependencies: bool = True, get_dev_dependencies: bool = False) -> List[Tuple[str, str]]:
         return []
 
