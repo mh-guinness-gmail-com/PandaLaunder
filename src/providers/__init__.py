@@ -1,15 +1,15 @@
-from .Npm import Npm as __npm
-from .Vscode import Vscode as __vscode
+from .Npm import Npm
+from .Vscode import Vscode
 
 providers = [
     {
         'name': 'npm',
         'products': 'npm packages',
-        'class': __npm,
+        'class': Npm,
     },
     {
         'name': 'vscode',
         'products': 'vscode extensions',
-        'class': __vscode,
+        'class': Vscode,
     },
 ]

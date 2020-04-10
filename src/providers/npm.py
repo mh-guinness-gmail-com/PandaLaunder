@@ -10,6 +10,7 @@ NPM_REGISTRY_URL = 'https://registry.npmjs.org'
 
 
 class Npm(Provider):
+    # provider for NPM packages
     @property
     def name(self):
         return 'npm'
