@@ -1,64 +1,61 @@
-import argparse
-import multiprocessing
+from multiprocessing.pool import ThreadPool
 import ssl
+import sys
 import os
-from str2bool import str2bool
+import logging
 
-
-from src.providers.vscode import Vscode
-from src.providers.npm import Npm
 from src.products_reader import get_lines
-from src.downloader import download
+from src.Downloader import Downloader
 from src.packager import package
+from src.command_line import args
+from src.providers import providers
 
-providers_as_args = {
-    'vscode': {
-        'help': 'specify if should download vscode extentions',
-        'class': Vscode,
-        'file_path': './vscode.list'
-    },
-    'npm': {
-        'help': 'specify if should download npm packages',
-        'class': Npm,
-        'file_path': './npm.list'
-    }
-}
-parser = argparse.ArgumentParser(description='CLI tool')
-for provider_flag, provider_args in providers_as_args.items():
-    parser.add_argument('--{0}'.format(provider_flag),
-                    type=str2bool,
-                    default=False,
-                    help=provider_args['help'])
-parser.add_argument('--concurrency', type=int, default=2,
-                    help='Number of workers = concurrency * CPU_CORES_COUNT')
-parser.add_argument('--proxy', type=str2bool, default=False,
-                    help='Turn on if you use a proxy')
-args = parser.parse_args()
+providers = {provider['name']: provider['class'] for provider in providers}
+
+
+def get_logger(level=logging.DEBUG):
+    logging.basicConfig()
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    console_handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter(
+        '%(asctime)s\t|\t%(levelname)s\t|\t%(message)s')
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+    logger.propagate = False
+    return logger
 
 
 def main() -> None:
-    base_directory = './packages'
-    resolved_products = []
+    logger = get_logger()
+    downloader = Downloader(args.temp_dir, logger=logger)
     num_workers = args.concurrency * os.cpu_count()
-    if args.proxy:
+    if not args.strict_ssl:
         ssl._create_default_https_context = ssl._create_unverified_context
-    for arg, value in vars(args).items():
-        if arg in providers_as_args and value:
-            provider_args = providers_as_args[arg]
-            products = get_lines(provider_args['file_path'])
-            provider = provider_args['class']()
-            provided_products, file_ext, registry = provider.provide(products)
-            resolved_products += [(base_directory,
-                                    registry,
-                                    product_name,
-                                    product_ver,
-                                    file_ext,
-                                    product_dl_url)
-                                    for product_name, product_ver, product_dl_url in provided_products]
-    with multiprocessing.Pool(num_workers) as pool:
-        output_paths = pool.starmap(download, resolved_products)
-        no_none = [path for path in output_paths if path]
-        package(no_none)
+
+    resolved_products = []
+    logger.info('Started resolving products')
+    for provider_name, value in vars(args).items():
+        if provider_name in providers and value:
+            logger.info(
+                'Started resolving products from provider {0}'.format(provider_name))
+            provider = providers[provider_name](logger)
+            product_names = get_lines(
+                '{0}/{1}.list'.format(args.input_dir, provider.name))
+            resolved_products += provider.provide(
+                [(product_name, 'latest') for product_name in product_names])
+
+    with ThreadPool(num_workers) as pool:
+        logger.info('Started Downloading')
+        downloaded_paths = pool.map(downloader.download, resolved_products)
+        paths_to_bundle = [path for path in downloaded_paths if path]
+        if len(paths_to_bundle) > 0:
+            logger.info('Started packaging')
+            package_name = package(paths_to_bundle, args.output_dir)
+            logger.debug(
+                'Finished packaging into file {0}'.format(package_name))
+        else:
+            logger.info('No new products - skipping packaging')
 
 
 if __name__ == "__main__":

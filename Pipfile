@@ -5,10 +5,13 @@ verify_ssl = true
 
 [dev-packages]
 pylint = "*"
+rope = "*"
+autopep8 = "*"
 
 [packages]
-requests = "*"
-node-semver = "*"
+requests = ">=2.23.0,<3"
+node-semver = ">=0.8.0,<1"
+str2bool = ">=1.1,<2"
 
 [requires]
 python_version = "3.8"
