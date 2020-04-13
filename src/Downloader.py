@@ -29,7 +29,8 @@ class Downloader:
                 self.__logger.critical(
                     'Product download URL must start with http. received {0}'.format(product.download_url))
                 raise ValueError from None
-            urllib.request.urlretrieve(product.download_url, output_path)
+            urllib.request.urlretrieve(urllib.request.Request(
+                product.download_url), output_path)
             self.__logger.info('Downloaded product {0}@{1} from provider {2}'.format(
                 product.name, product.version, product.provider.name))
 
