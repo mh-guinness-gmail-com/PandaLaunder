@@ -1,3 +1,6 @@
+"""The providers module exports all providers.
+It also includes metadata for each provider to assist usage
+"""
 from .Npm import Npm
 from .Vscode import Vscode
 
