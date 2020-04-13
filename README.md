@@ -1,1 +1,2 @@
-<img src="./media/logo.svg" height="100">
+# PandaLaunder
+# <img src="./media/logo.svg" height="700">
