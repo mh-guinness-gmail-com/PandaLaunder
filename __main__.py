@@ -1,12 +1,10 @@
-from multiprocessing.pool import ThreadPool
 import ssl
 import sys
 import os
 import logging
 
+from src import packagers
 from src.products_reader import get_lines
-from src.Downloader import Downloader
-from src.packager import package
 from src.command_line import args
 from src.providers import providers
 
@@ -28,7 +26,6 @@ def get_logger(level=logging.DEBUG):
 
 def main() -> None:
     logger = get_logger()
-    downloader = Downloader(args.temp_dir, logger=logger)
     num_workers = args.concurrency * os.cpu_count()
     if not args.strict_ssl:
         ssl._create_default_https_context = ssl._create_unverified_context
@@ -44,18 +41,9 @@ def main() -> None:
                 '{0}/{1}.list'.format(args.input_dir, provider.name))
             resolved_products += provider.provide(
                 [(product_name, 'latest') for product_name in product_names])
-
-    with ThreadPool(num_workers) as pool:
-        logger.info('Started Downloading')
-        downloaded_paths = pool.map(downloader.download, resolved_products)
-        paths_to_bundle = [path for path in downloaded_paths if path]
-        if len(paths_to_bundle) > 0:
-            logger.info('Started packaging')
-            package_name = package(paths_to_bundle, args.output_dir)
-            logger.debug(
-                'Finished packaging into file {0}'.format(package_name))
-        else:
-            logger.info('No new products - skipping packaging')
+    
+    packager = packagers.get_packager(args.packager, **vars(args), logger=logger, num_workers=num_workers)
+    packager.package(resolved_products)
 
 
 if __name__ == "__main__":
