@@ -18,7 +18,7 @@ class Downloader:
         package_dir = os.path.join(
             self.__base_dir, provider.name, product.name)
         os.makedirs(package_dir, exist_ok=True)
-        return os.path.join(package_dir, product.version + '.' + provider.file_ext)
+        return os.path.join(package_dir, '{0}.{1}'.format(product.version, provider.file_ext))
 
     def download(self, product: Product) -> str or None:
         output_path = self.__get_output_file_path(product.provider, product)
