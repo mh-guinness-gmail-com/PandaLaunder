@@ -25,12 +25,14 @@ class Downloader:
         if self.__overwrite or not os.path.isfile(output_path):
             self.__logger.debug('Started Downloading product {0}@{1} from provider {2} to file {3}'.format(
                 product.name, product.version, product.provider.name, output_path))
-            if not product.download_url.lower().startswith('http'):
+            url = product.download_url
+            if url.lower().startswith('http'):
+                req = urllib.request.Request(url)
+            else:
                 self.__logger.critical(
-                    'Product download URL must start with http. received {0}'.format(product.download_url))
+                    'Product download URL must start with http. received {0}'.format(url))
                 raise ValueError from None
-            urllib.request.urlretrieve(urllib.request.Request(
-                product.download_url), output_path)
+            urllib.request.urlretrieve(req, output_path)
             self.__logger.info('Downloaded product {0}@{1} from provider {2}'.format(
                 product.name, product.version, product.provider.name))
 
