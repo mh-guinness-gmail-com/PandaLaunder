@@ -2,9 +2,11 @@ from typing import List, Tuple
 import requests
 import semver
 
+
 from .Provider import Provider
 from src.Product import Product
 from src.http_util import validate_http_status_code
+
 
 NPM_REGISTRY_URL = 'https://registry.npmjs.org'
 
@@ -19,7 +21,8 @@ class Npm(Provider):
         return 'tgz'
 
     def _resolve_product(self, product_name, product_version):
-        response = requests.get('{0}/{1}'.format(NPM_REGISTRY_URL, product_name))
+        response = requests.get(
+            '{0}/{1}'.format(NPM_REGISTRY_URL, product_name))
         validate_http_status_code(
             response.status_code, self, product_name, product_version)
         response_payload = response.json()
@@ -39,7 +42,8 @@ class Npm(Provider):
         return Product(self, product_name, version, download_url)
 
     def _get_dependencies(self, product: Product, *, get_dependencies=True, get_dev_dependencies=False) -> List[Tuple[str, str]]:
-        response = requests.get('{0}/{1}/{2}'.format(NPM_REGISTRY_URL, product.name, product.version))
+        response = requests.get(
+            '{0}/{1}/{2}'.format(NPM_REGISTRY_URL, product.name, product.version))
         validate_http_status_code(
             response.status_code, self, product.name, product.version)
         response_payload = response.json()

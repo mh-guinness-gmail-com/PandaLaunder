@@ -2,6 +2,7 @@ from threading import Thread
 from queue import Queue
 from typing import Callable, List
 
+
 _stop_task = object()
 
 

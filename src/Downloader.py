@@ -2,6 +2,7 @@ import os
 import urllib.request
 from logging import Logger
 
+
 from src.providers import Provider
 from src.Product import Product
 

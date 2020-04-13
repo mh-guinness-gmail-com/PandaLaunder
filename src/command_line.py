@@ -1,7 +1,9 @@
 import argparse
 from str2bool import str2bool
 
+
 from src.providers import providers
+
 
 __parser = argparse.ArgumentParser()
 

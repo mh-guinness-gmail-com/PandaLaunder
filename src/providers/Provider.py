@@ -3,8 +3,10 @@ from typing import List, Tuple, Dict
 from threading import Lock
 from logging import Logger
 
+
 from src.Product import Product
 from src.ThreadPool import ThreadPool
+
 
 def flatten(list_of_lists: List[List[object]]) -> List[object]:
     return [item for item_list in list_of_lists for item in item_list]
@@ -37,7 +39,7 @@ class Provider(ABC):
         cache = {}
         cache_lock = Lock()
         all_products = []
-        args=[all_products, cache, cache_lock]
+        args = [all_products, cache, cache_lock]
         with ThreadPool(self.__provide_worker, thread_count=concurrency, action_parameters=args) as pool:
             pool.add_tasks(products)
         return all_products

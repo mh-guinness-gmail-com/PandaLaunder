@@ -1,9 +1,11 @@
 import requests
 import json
 
+
 from .Provider import Provider
 from src.Product import Product
 from src.http_util import validate_http_status_code
+
 
 _VERSION_LIST_URL = 'https://code.visualstudio.com/sha'
 _EXTENSION_GALLERY_URL = 'https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery'
@@ -55,15 +57,19 @@ class Vscode(Provider):
                 _EXTENSION_GALLERY_URL,
                 data=json.dumps(Vscode.__generate_extension_gallery_body(
                     product_name, product_version)),
-                headers=Vscode.__generate_extension_gallery_headers(vscode_version),
+                headers=Vscode.__generate_extension_gallery_headers(
+                    vscode_version),
             )
-            validate_http_status_code(response.status_code, self, product_name, product_version)
+            validate_http_status_code(
+                response.status_code, self, product_name, product_version)
             response_payload = response.json()
 
             extension_latest_md = response_payload['results'][0]['extensions'][0]['versions'][0]
             version = extension_latest_md['version']
-            download_url = extension_latest_md['fallbackAssetUri'] + _DOWNLOAD_ENDPOINT
-            self._logger.info('Resolved vscode extension {0} for vscode version {1} to version {2}'.format(product_name, vscode_version, version))
+            download_url = extension_latest_md['fallbackAssetUri'] + \
+                _DOWNLOAD_ENDPOINT
+            self._logger.info('Resolved vscode extension {0} for vscode version {1} to version {2}'.format(
+                product_name, vscode_version, version))
             return Product(self, product_name, version, download_url)
         except Exception as e:
             raise ValueError(product_name, Vscode.__get_vscode_latest()) from e
