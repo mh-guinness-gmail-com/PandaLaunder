@@ -1,4 +1,5 @@
 import argparse
+import tempfile
 from str2bool import str2bool
 
 
@@ -15,7 +16,7 @@ __parser.add_argument('--output-dir', '-o', type=str, default='./out',
                       help='Base directory to place bundled zip file in')
 __parser.add_argument('--packager', '-p', type=str, default='m',
                       help='Which packager to use (m for memory based packager or f for FS based packager)')
-__parser.add_argument('--temp-dir', '-t', type=str, default='./tmp',
+__parser.add_argument('--temp-dir', '-t', type=str, default=tempfile.TemporaryDirectory().name,
                       help='Base directory to place all downloaded files before bundling. Applies only for FS based packager')
 __parser.add_argument('--strict-ssl', type=str2bool, default=True,
                       help='False disables ssl certificate checks')
