@@ -8,6 +8,7 @@ pylint = "*"
 
 [packages]
 requests = "*"
+pymongo = "*"
 
 [requires]
 python_version = "3.8"
