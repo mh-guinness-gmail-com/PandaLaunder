@@ -19,7 +19,7 @@ class InMemoryPackager(Packager):
             for product in products:
                 product_descriptor = 'product {0}@{1} from provider {2}'.format(product.name, product.version, product.provider.name)
                 self._logger.debug('Downloading {0}'.format(product_descriptor))
-                path = '{0}/{1}/{2}.{3}'.format(product.provider.name,product.name, product.version, product.provider.file_ext)
+                path = '{0}/{1}/{2}.{3}'.format(product.provider.name, product.name, product.version, product.provider.file_ext)
                 file = requests.get(product.download_url)
                 self._logger.debug('Done downloading {0}'.format(product_descriptor))
                 self._logger.debug('Packaging {0}'.format(product_descriptor))
