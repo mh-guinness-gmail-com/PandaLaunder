@@ -1,7 +1,7 @@
 import argparse
 from str2bool import str2bool
 
-
+from src import __version__ as version
 from src.providers import providers
 
 
@@ -17,6 +17,9 @@ __parser.add_argument('--input-dir', '-i', type=str, default='./in',
                       help='Base directory where list files are located')
 __parser.add_argument('--strict-ssl', type=str2bool, default=True,
                       help='False disables ssl certificate checks')
+__parser.add_argument('--version', action='version',
+                    version='{}'.format(version),
+                    help='show the version number and exit')
 
 for provider in providers:
     __parser.add_argument('--{0}'.format(provider['name']),
