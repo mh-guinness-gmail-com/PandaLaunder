@@ -39,7 +39,7 @@ def main() -> None:
             logger.info(
                 'Started resolving products from provider {0}'.format(provider_name))
             provider = providers[provider_name](logger)
-            product_names = get_packages_by_provider(provider.name)
+            product_names = [package['name'] for package in get_packages_by_provider(provider.name)]
             resolved_products += provider.provide(
                 [(product_name, 'latest') for product_name in product_names])
     
