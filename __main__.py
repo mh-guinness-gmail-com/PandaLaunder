@@ -4,7 +4,6 @@ import os
 import logging
 
 from src import packagers
-from src.products_reader import get_lines
 from src.command_line import args
 from src.providers import get_providers_classes
 from src.providers.Vscode import Vscode
