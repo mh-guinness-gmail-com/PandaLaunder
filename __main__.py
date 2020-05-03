@@ -6,9 +6,11 @@ import logging
 from src import packagers
 from src.products_reader import get_lines
 from src.command_line import args
-from src.providers import providers
+from src.providers import get_providers_classes
+from src.providers.Vscode import Vscode
+from src.DAL.db import get_packages_by_provider
 
-providers = {provider['name']: provider['class'] for provider in providers}
+providers = {provider['name']: provider['class'] for provider in get_providers_classes()}
 
 
 def get_logger(level=logging.DEBUG):
@@ -37,8 +39,7 @@ def main() -> None:
             logger.info(
                 'Started resolving products from provider {0}'.format(provider_name))
             provider = providers[provider_name](logger)
-            product_names = get_lines(
-                '{0}/{1}.list'.format(args.input_dir, provider.name))
+            product_names = get_packages_by_provider(provider.name)
             resolved_products += provider.provide(
                 [(product_name, 'latest') for product_name in product_names])
     

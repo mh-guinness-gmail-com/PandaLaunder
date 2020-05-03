@@ -1,19 +1,13 @@
 """The providers module exports all providers.
 It also includes metadata for each provider to assist usage
 """
-from .Npm import Npm
-from .Vscode import Vscode
 
+from ..DAL.db import get_providers
 
-providers = [
-    {
-        'name': 'npm',
-        'products': 'npm packages',
-        'class': Npm,
-    },
-    {
-        'name': 'vscode',
-        'products': 'vscode extensions',
-        'class': Vscode,
-    },
-]
+def get_providers_classes():
+    providers = get_providers()
+    
+    for provider in providers:
+        class_name = '{0}'.format(str(provider['name']).capitalize())
+        provider['class'] = __import__(class_name, globals(), locals(), [],  1).__dict__[class_name]
+    return providers

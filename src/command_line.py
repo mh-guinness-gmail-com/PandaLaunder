@@ -5,7 +5,7 @@ from str2bool import str2bool
 
 from src import __version__ as version
 from src.packagers import packager_type_codes, default_packager_type_code
-from src.providers import providers
+from src.providers import get_providers_classes
 
 
 __parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
@@ -31,7 +31,7 @@ packager_type_helps = [
 __parser.add_argument('--packager', '-p', type=str, default=default_packager_type_code, choices=packager_type_codes.keys(),
                       help='Which packager to use. options are:\n{0}'.format('\n'.join(packager_type_helps)))
 
-for provider in providers:
+for provider in get_providers_classes():
     __parser.add_argument('--{0}'.format(provider['name']),
                           action='store_true',
                           default=False,
