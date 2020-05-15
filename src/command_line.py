@@ -3,6 +3,7 @@ import tempfile
 import re
 from str2bool import str2bool
 
+from src import __version__ as version
 from src.packagers import packager_type_codes, default_packager_type_code
 from src.providers import providers
 
@@ -19,6 +20,9 @@ __parser.add_argument('--temp-dir', '-t', type=str, default=tempfile.TemporaryDi
                       help='Base directory to place all downloaded files before bundling. Applies only for FS based packager')
 __parser.add_argument('--strict-ssl', type=str2bool, default=True,
                       help='False disables ssl certificate checks')
+__parser.add_argument('--version', action='version',
+                    version='{}'.format(version),
+                    help='show the version number and exit')
 
 packager_type_helps = [
     '{0} - use{1}'.format(code, re.sub('([A-Z])', ' \\g<0>', packager_type.__name__))
