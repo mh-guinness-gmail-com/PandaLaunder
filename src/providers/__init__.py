@@ -1,13 +1,22 @@
 """The providers module exports all providers.
 It also includes metadata for each provider to assist usage
 """
+from typing import List
 
-from ..DAL.db import get_providers
+from src.DAL import DAL
+from src.DAL.Provider import Provider as DALProvider
+from src.providers.Provider import Provider as ProviderClass
 
-def get_providers_classes():
-    providers = get_providers()
+class __Provider(DALProvider):
+    def __init__(self, provider: DALProvider):
+        super().__init__(provider.name, provider.products)
+
+        class_name = '{0}'.format(str(provider.name).capitalize())
+        self.__class = __import__(class_name, globals(), locals(), [],  1).__dict__[class_name]
     
-    for provider in providers:
-        class_name = '{0}'.format(str(provider['name']).capitalize())
-        provider['class'] = __import__(class_name, globals(), locals(), [],  1).__dict__[class_name]
-    return providers
+    @property
+    def provider_class(self) -> ProviderClass:
+        return self.__class
+
+def get_providers(db: DAL) -> List[__Provider]:
+    return [ __Provider(provider) for provider in db.get_providers() ]

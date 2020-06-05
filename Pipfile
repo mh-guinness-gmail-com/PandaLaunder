@@ -13,7 +13,6 @@ requests = ">=2.23.0,<3"
 node-semver = ">=0.8.0,<1"
 str2bool = ">=1.1,<2"
 pymongo = "*"
-dnspython = "*"
 
 [requires]
 python_version = "3.8"

@@ -32,9 +32,9 @@ __parser.add_argument('--packager', '-p', type=str, default=default_packager_typ
                       help='Which packager to use. options are:\n{0}'.format('\n'.join(packager_type_helps)))
 
 for provider in get_providers_classes():
-    __parser.add_argument('--{0}'.format(provider['name']),
+    __parser.add_argument('--{0}'.format(provider.name),
                           action='store_true',
                           default=False,
-                          help='specify if should download {0}'.format(provider['products']))
+                          help='specify if should download {0}'.format(provider.products))
 
 args = __parser.parse_args()
