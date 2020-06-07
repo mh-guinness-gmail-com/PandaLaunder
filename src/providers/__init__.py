@@ -6,6 +6,7 @@ from typing import List, Dict
 
 from src.import_util import import_all_public_sibling_modules
 
+from ._Provider import Provider
 
 def get_providers() -> List[Dict]:
     return import_all_public_sibling_modules(__file__).items()

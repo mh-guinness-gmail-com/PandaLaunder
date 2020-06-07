@@ -5,8 +5,7 @@ from logging import Logger
 
 
 from src.Product import Product
-from ._Provider import Provider
-from ._Product import Product as DALProduct
+from src.providers import Provider
 
 
 class DAL(ABC):
@@ -43,5 +42,5 @@ class DAL(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_products(self, provider: str = None) -> List[DALProduct]:
+    def get_products(self, provider: str = None) -> List[Product]:
         raise NotImplementedError()
