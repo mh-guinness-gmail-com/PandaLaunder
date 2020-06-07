@@ -40,11 +40,12 @@ for provider in get_providers():
                           help=f'specify if should download {provider.products}')
 
 # Packager
-packager_type_helps = [
-    f'{code} - use {re.sub('([A-Z])', ' \\g<0>')}'
+packager_type_helps = '\n'.join([
+    '{0} - use{1}'.format(code, re.sub('([A-Z])', ' \\g<0>', packager_type.__name__))
     for code, packager_type in packager_type_codes.items()
-]
-__parser.add_argument('--packager', '-p', type=str, default=default_packager_type_code, choices=packager_type_codes.keys(),
-                      help=f'Which packager to use. options are:\n{'\n'.join(packager_type_helps))}')
+])
+__parser.add_argument('--packager', '-p', type=str,
+                      default=default_packager_type_code, choices=packager_type_codes.keys(),
+                      help=f'Which packager to use. options are:\n{packager_type_helps}')
 
 args = __parser.parse_args()
