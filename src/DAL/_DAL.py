@@ -17,6 +17,12 @@ class DAL(ABC):
     def __exit__(self, type, value, traceback) -> None:
         self.close()
 
+    @property
+    @staticmethod
+    @abstractmethod
+    def name() -> str:
+        raise NotImplementedError()
+
     @abstractmethod
     def close(self) -> None:
         raise NotImplementedError()
