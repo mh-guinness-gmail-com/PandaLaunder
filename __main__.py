@@ -9,8 +9,8 @@ from src.providers import get_providers
 
 
 args_dict = vars(args)
-providers = { provider['name']: provider['class'] for provider in get_providers() }
-databases = { db['name']: db['class'] for db in DAL.get_databases() }
+providers = { provider.name: provider for provider in get_providers() }
+databases = { db.name: db for db in DAL.get_databases() }
 
 def get_logger(level=logging.DEBUG):
     logging.basicConfig()
@@ -34,7 +34,7 @@ def main() -> None:
         logger.info(f'Successfully connect to database of type {args.db}')
 
         logger.info('Started resolving providers')
-        db_providers = [ db['name'] for db in db.get_providers() ]
+        db_providers = [ provider.name for provider in db.get_providers() ]
         selected_providers = [ key for key in providers if args_dict[key] ]
         for provider in selected_providers:
             if provider not in db_providers:
@@ -47,11 +47,11 @@ def main() -> None:
         for provider_name in selected_providers:
                 logger.info(f'Started resolving products from provider {provider_name}')
                 provider = providers[provider_name]
-                product_names = [package['name'] for package in db.get_products(provider.name)]
-                logger.info(f'Found {len(product_names)} products in DB for provider {provider_name}')
-                provider_products = provider(logger).provide([(product_name, 'latest') for product_name in product_names])
+                requested_products = [ (product.name, product.version) for product in db.get_products(provider.name) ]
+                logger.info(f'Found {len(requested_products)} products in DB for provider {provider_name}')
+                provider_products = provider(logger).provide(requested_products)
                 resolved_products += provider_products
-                logger.info(f'Resolved {len(provider_products)} products from provider {provider_name}')
+                logger.info(f'Resolved {len(provider_products)} products for provider {provider_name}')
         logger.info('Successfully resolved products')
 
         for product in resolved_products:

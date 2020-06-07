@@ -27,23 +27,24 @@ __parser.add_argument('--version', '-v', action='version',
 
 # Database
 __parser.add_argument('--database', type=str, default=DAL.default,
+                      choices=[db.name for db in DAL.get_databases()],
                       help='Specify used database')
 __parser.add_argument('--database-args', type=str,
                       help='Specify arguments for used database')
 
 # Providers
 for provider in get_providers():
-    __parser.add_argument('--{0}'.format(provider['name']),
+    __parser.add_argument(f'--{provider.name}',
                           action='store_true',
                           default=False,
-                          help='specify if should download {0}'.format(provider['products']))
+                          help=f'specify if should download {provider.products}')
 
 # Packager
 packager_type_helps = [
-    '{0} - use{1}'.format(code, re.sub('([A-Z])', ' \\g<0>', packager_type.__name__))
+    f'{code} - use {re.sub('([A-Z])', ' \\g<0>')}'
     for code, packager_type in packager_type_codes.items()
 ]
 __parser.add_argument('--packager', '-p', type=str, default=default_packager_type_code, choices=packager_type_codes.keys(),
-                      help='Which packager to use. options are:\n{0}'.format('\n'.join(packager_type_helps)))
+                      help=f'Which packager to use. options are:\n{'\n'.join(packager_type_helps))}')
 
 args = __parser.parse_args()

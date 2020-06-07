@@ -28,4 +28,4 @@ def import_all_public_sibling_modules(module_path: str) -> List[Dict[str, Dict]]
 
     siblings = [ __import_sibling(path, [ module_path ]) for path in os.listdir(os.path.dirname(module_path))]
 
-    return { name: module for name, module in siblings if module }
+    return [ module[name] for name, module in siblings if module ]
