@@ -45,5 +45,9 @@ class DAL(ABC, metaclass=MetaDAL):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_products(self, provider: str = None) -> List[Product]:
+    def get_products(self, provider: Provider = None) -> List[Product]:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def is_downloaded_before(self, product: Product) -> bool:
         raise NotImplementedError()

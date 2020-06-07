@@ -67,5 +67,20 @@ class FS(DAL):
         return [
             Product(**product)
             for product in self.__content['products']
-            if product['provider'] == provider or not provider
+            if not provider or product['provider'] == provider.name
         ]
+    
+    def is_downloaded_before(self, product):
+        compare_keys = ['provider', 'name', 'version']
+        product = product.to_dict()
+        
+        for resolved in self.__content['resolved']:
+            same = True
+            for key in compare_keys:
+                if product[key] != resolved[key]:
+                    same = False
+                    break
+            if same:
+                return True
+        return False
+

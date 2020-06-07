@@ -47,20 +47,30 @@ def main() -> None:
         for provider_name in selected_providers:
                 logger.info(f'Started resolving products from provider {provider_name}')
                 provider = providers[provider_name]
-                requested_products = [ (product.name, product.version) for product in db.get_products(provider.name) ]
+                requested_products = [ (product.name, product.version) for product in db.get_products(provider) ]
                 logger.info(f'Found {len(requested_products)} products in DB for provider {provider_name}')
                 provider_products = provider(logger).provide(requested_products)
                 resolved_products += provider_products
                 logger.info(f'Resolved {len(provider_products)} products for provider {provider_name}')
         logger.info('Successfully resolved products')
 
+        resolved_products = [ product for product in resolved_products if not db.is_downloaded_before(product) ]
+        logger.info(f'Found {len(resolved_products)} new products to download')
+
+        if len(resolved_products) < 1:
+            logger.info('No new products found. exiting')
+            return
+
+        logger.info('Started packaging resolved products')
+        packager = packagers.get_packager(args.packager, **args_dict, logger=logger, num_workers=num_workers)
+        packager.package(resolved_products)
+        logger.info('Successfully packaged products')
+
+        logger.info('Reporting to DB')
         for product in resolved_products:
             db.add_resolved_product(product)
 
-    logger.info('Started packaging resolved products')
-    packager = packagers.get_packager(args.packager, **args_dict, logger=logger, num_workers=num_workers)
-    packager.package(resolved_products)
-    logger.info('Successfully packaged products')
+        logger.info('Done')
 
 
 if __name__ == "__main__":
