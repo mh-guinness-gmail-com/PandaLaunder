@@ -7,7 +7,7 @@ from src.Product import Product
 from .Provider import Provider
 
 class DAL(ABC):
-    def __init__(self, logger: Logger):
+    def __init__(self, logger: Logger, params: str):
         """Interface for a DAL."""
         self._logger = logger
 

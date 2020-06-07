@@ -10,7 +10,7 @@ from src.providers import get_providers
 
 args_dict = vars(args)
 providers = { provider['name']: provider['class'] for provider in get_providers() }
-databases = { db['name']: db['factory'] for db in DAL.get_databases() }
+databases = { db['name']: db['class'] for db in DAL.get_databases() }
 
 def get_logger(level=logging.DEBUG):
     logging.basicConfig()
