@@ -2,7 +2,7 @@ import requests
 import json
 
 
-from .Provider import Provider
+from ._Provider import Provider
 from src.Product import Product
 from src.http_util import validate_http_status_code
 

@@ -4,7 +4,7 @@ from typing import List
 from logging import Logger
 
 from src.Product import Product
-from .Provider import Provider
+from ._Provider import Provider
 
 class DAL(ABC):
     def __init__(self, logger: Logger, params: str):
