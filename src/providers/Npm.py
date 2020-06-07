@@ -17,6 +17,11 @@ class Npm(Provider):
         return 'npm'
 
     @property
+    @staticmethod
+    def products(self):
+        return 'npm packages'
+
+    @property
     def file_ext(self):
         return 'tgz'
 

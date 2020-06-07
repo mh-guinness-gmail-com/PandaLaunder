@@ -44,6 +44,11 @@ class Vscode(Provider):
         return 'vscode'
 
     @property
+    @staticmethod
+    def products(self):
+        return 'vscode extensions'
+
+    @property
     def file_ext(self):
         return 'vsix'
 

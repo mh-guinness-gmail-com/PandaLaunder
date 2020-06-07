@@ -5,11 +5,11 @@ import logging
 
 from src import packagers
 from src.command_line import args
-from src.providers import get_providers_classes
+from src.providers import get_providers
 from src.providers.Vscode import Vscode
 from src.DAL.db import get_packages_by_provider
 
-providers = {provider['name']: provider['class'] for provider in get_providers_classes()}
+providers = {provider['name']: provider['class'] for provider in get_providers()}
 
 
 def get_logger(level=logging.DEBUG):

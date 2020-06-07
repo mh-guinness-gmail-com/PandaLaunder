@@ -23,6 +23,12 @@ class Provider(ABC):
         raise NotImplementedError()
 
     @property
+    @staticmethod
+    @abstractmethod
+    def products(self) -> str:
+        raise NotImplementedError()
+
+    @property
     @abstractmethod
     def file_ext(self) -> str:
         raise NotImplementedError()
