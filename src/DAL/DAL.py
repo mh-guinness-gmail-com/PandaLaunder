@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import List
 from logging import Logger
 
+from src.Product import Product
 from .Provider import Provider
 
 class DAL(ABC):
@@ -21,9 +22,17 @@ class DAL(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    def add_provider(self, name: str, packages: str) -> None:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def add_resolved_product(self, product: Product) -> None:
+        raise NotImplementedError()
+
+    @abstractmethod
     def get_providers(self) -> List[Provider]:
         raise NotImplementedError()
 
     @abstractmethod
-    def get_products(self, provider: str) -> List[str]:
+    def get_products(self, provider: str = None) -> List[str]:
         raise NotImplementedError()
