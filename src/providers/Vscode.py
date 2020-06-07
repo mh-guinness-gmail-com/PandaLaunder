@@ -39,19 +39,16 @@ class Vscode(Provider):
             'flags': 0x200 + 0x2,  # 0x200 - only latest; 0x2 - include files
         }
 
-    @property
     @staticmethod
-    def name():
+    def _get_name():
         return 'vscode'
 
-    @property
     @staticmethod
-    def products():
+    def _get_products():
         return 'vscode extensions'
 
-    @property
     @staticmethod
-    def file_ext():
+    def _get_file_ext():
         return 'vsix'
 
     def _resolve_product(self, product_name, product_version):

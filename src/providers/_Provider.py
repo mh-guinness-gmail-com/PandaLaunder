@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, ABCMeta
 from typing import List, Tuple, Dict
 from threading import Lock
 from logging import Logger
@@ -11,27 +11,43 @@ def flatten(list_of_lists: List[List[object]]) -> List[object]:
     return [item for item_list in list_of_lists for item in item_list]
 
 
-class Provider(ABC):
+class MetaProvider(ABCMeta):
+    @property
+    def name(self) -> str:
+        return self._get_name()
+
+    @property
+    def products(self) -> str:
+        return self._get_products()
+
+    @property
+    def file_ext(self) -> str:
+        return self._get_file_ext()
+    
+    def to_dict(self) -> Dict[str, str]:
+        return {
+            'name': self.name,
+            'products': self.products,
+        }
+
+class Provider(ABC, metaclass=MetaProvider):
     def __init__(self, logger: Logger):
         """Interface for a Provider."""
         self._logger = logger
 
-    @property
     @staticmethod
     @abstractmethod
-    def name() -> str:
+    def _get_name() -> str:
         raise NotImplementedError()
 
-    @property
     @staticmethod
     @abstractmethod
-    def products() -> str:
+    def _get_products() -> str:
         raise NotImplementedError()
 
-    @property
     @staticmethod
     @abstractmethod
-    def file_ext() -> str:
+    def _get_file_ext() -> str:
         raise NotImplementedError()
 
     @abstractmethod
@@ -63,9 +79,3 @@ class Provider(ABC):
         result_set.append(resolved)
         dependencies = self._get_dependencies(resolved)
         return dependencies
-
-    def to_dict(self) -> Dict[str, str]:
-        return {
-            'name': self.name,
-            'products': self.products,
-        }

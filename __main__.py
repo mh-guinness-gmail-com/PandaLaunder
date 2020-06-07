@@ -30,8 +30,8 @@ def main() -> None:
         ssl._create_default_https_context = ssl._create_unverified_context
 
     logger.info('Connecting to Database')
-    with databases[args.db](logger, args.db_params) as db:
-        logger.info(f'Successfully connect to database of type {args.db}')
+    with databases[args.database](logger, args.database_args) as db:
+        logger.info(f'Successfully connect to database of type {args.database}')
 
         logger.info('Started resolving providers')
         db_providers = [ provider.name for provider in db.get_providers() ]
@@ -39,7 +39,7 @@ def main() -> None:
         for provider in selected_providers:
             if provider not in db_providers:
                 logger.warning(f'Provider {provider} not in database. It will be added')
-                db.add_provider(provider, providers[provider].products)
+                db.add_provider(providers[provider])
         logger.info('Successfully resolved providers')
         
         logger.info('Started resolving products')

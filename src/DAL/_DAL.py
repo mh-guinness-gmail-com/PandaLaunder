@@ -1,5 +1,5 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, ABCMeta
 from typing import List
 from logging import Logger
 
@@ -7,8 +7,12 @@ from logging import Logger
 from src.Product import Product
 from src.providers import Provider
 
+class MetaDAL(ABCMeta):
+    @property
+    def name(self) -> str:
+        return self._get_name()
 
-class DAL(ABC):
+class DAL(ABC, metaclass=MetaDAL):
     def __init__(self, logger: Logger, params: str):
         """Interface for a DAL."""
         self._logger = logger
@@ -19,10 +23,9 @@ class DAL(ABC):
     def __exit__(self, type, value, traceback) -> None:
         self.close()
 
-    @property
     @staticmethod
     @abstractmethod
-    def name() -> str:
+    def _get_name() -> str:
         raise NotImplementedError()
 
     @abstractmethod
@@ -30,7 +33,7 @@ class DAL(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def add_provider(self, name: str, products: str) -> None:
+    def add_provider(self, provider: Provider) -> None:
         raise NotImplementedError()
 
     @abstractmethod

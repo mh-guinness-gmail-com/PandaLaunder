@@ -12,19 +12,16 @@ NPM_REGISTRY_URL = 'https://registry.npmjs.org'
 
 
 class Npm(Provider):
-    @property
     @staticmethod
-    def name():
+    def _get_name():
         return 'npm'
 
-    @property
     @staticmethod
-    def products():
+    def _get_products():
         return 'npm packages'
 
-    @property
     @staticmethod
-    def file_ext():
+    def _get_file_ext():
         return 'tgz'
 
     def _resolve_product(self, product_name, product_version):
