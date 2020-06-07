@@ -18,19 +18,21 @@ class Provider(ABC):
         self._logger = logger
 
     @property
+    @staticmethod
     @abstractmethod
-    def name(self) -> str:
+    def name() -> str:
         raise NotImplementedError()
 
     @property
     @staticmethod
     @abstractmethod
-    def products(self) -> str:
+    def products() -> str:
         raise NotImplementedError()
 
     @property
+    @staticmethod
     @abstractmethod
-    def file_ext(self) -> str:
+    def file_ext() -> str:
         raise NotImplementedError()
 
     @abstractmethod

@@ -6,9 +6,9 @@ from typing import List
 from multiprocessing.pool import ThreadPool
 
 
-from src.providers import Provider
 from src.Product import Product
 from .Packager import Packager
+
 
 class FileSystemPackager(Packager):
     def __init__(self, logger: Logger, output_dir: str, tmp_dir: str, num_workers: int):
@@ -23,19 +23,20 @@ class FileSystemPackager(Packager):
             paths_to_bundle = [path for path in downloaded_paths if path]
             if len(paths_to_bundle) > 0:
                 self._logger.info('Started packaging')
-                package_name = self.__zip(paths_to_bundle)
+                self.__zip(paths_to_bundle)
                 self._logger.debug(
-                    'Finished packaging into file {0}'.format(package_name))
+                    'Finished packaging into file {0}'.format(self.output_path))
             else:
                 self._logger.info('No new products - skipping packaging')
 
-    def __get_output_file_path(self, provider: Provider, product: Product) -> str:
+    def __get_output_file_path(self, product: Product) -> str:
+        provider = product.provider
         package_dir = os.path.join(self.__tmp_dir, provider.name, product.name)
         os.makedirs(package_dir, exist_ok=True)
         return os.path.join(package_dir, '{0}.{1}'.format(product.version, provider.file_ext))
 
     def __download(self, product: Product) -> str or None:
-        output_path = self.__get_output_file_path(product.provider, product)
+        output_path = self.__get_output_file_path(product)
         if not os.path.isfile(output_path):
             self._logger.debug('Started Downloading product {0}@{1} from provider {2} to file {3}'.format(product.name, product.version, product.provider.name, output_path))
             url = product.download_url

@@ -1,8 +1,11 @@
+from typing import Type
+
+
 from .providers import Provider
 
 
 class Product:
-    def __init__(self, provider: Provider, name: str, version: str, download_url: str):
+    def __init__(self, provider: Type[Provider], name: str, version: str, download_url: str):
         """A structure that holds a single product."""
         self.__provider = provider
         self.__name = name
@@ -10,7 +13,7 @@ class Product:
         self.__download_url = download_url
 
     @property
-    def provider(self) -> Provider:
+    def provider(self) -> Type[Provider]:
         return self.__provider
 
     @property

@@ -13,16 +13,18 @@ NPM_REGISTRY_URL = 'https://registry.npmjs.org'
 
 class Npm(Provider):
     @property
-    def name(self):
+    @staticmethod
+    def name():
         return 'npm'
 
     @property
     @staticmethod
-    def products(self):
+    def products():
         return 'npm packages'
 
     @property
-    def file_ext(self):
+    @staticmethod
+    def file_ext():
         return 'tgz'
 
     def _resolve_product(self, product_name, product_version):
@@ -44,7 +46,7 @@ class Npm(Provider):
         self._logger.info('Resolved npm package {0}@{1} to version {2}'.format(
             product_name, product_version, version))
         download_url = response_payload['versions'][version]['dist']['tarball']
-        return Product(self, product_name, version, download_url)
+        return Product(Npm, product_name, version, download_url)
 
     def _get_dependencies(self, product: Product, *, get_dependencies=True, get_dev_dependencies=False) -> List[Tuple[str, str]]:
         response = requests.get(

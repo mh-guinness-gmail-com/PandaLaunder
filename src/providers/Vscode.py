@@ -40,16 +40,18 @@ class Vscode(Provider):
         }
 
     @property
-    def name(self):
+    @staticmethod
+    def name():
         return 'vscode'
 
     @property
     @staticmethod
-    def products(self):
+    def products():
         return 'vscode extensions'
 
     @property
-    def file_ext(self):
+    @staticmethod
+    def file_ext():
         return 'vsix'
 
     def _resolve_product(self, product_name, product_version):
@@ -75,6 +77,6 @@ class Vscode(Provider):
                 _DOWNLOAD_ENDPOINT
             self._logger.info('Resolved vscode extension {0} for vscode version {1} to version {2}'.format(
                 product_name, vscode_version, version))
-            return Product(self, product_name, version, download_url)
+            return Product(Vscode, product_name, version, download_url)
         except Exception as e:
             raise ValueError(product_name, Vscode.__get_vscode_latest()) from e

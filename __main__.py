@@ -46,10 +46,10 @@ def main() -> None:
         resolved_products = []
         for provider_name in selected_providers:
                 logger.info(f'Started resolving products from provider {provider_name}')
-                provider = providers[provider_name](logger)
+                provider = providers[provider_name]
                 product_names = [package['name'] for package in db.get_products(provider.name)]
                 logger.info(f'Found {len(product_names)} products in DB for provider {provider_name}')
-                provider_products = provider.provide([(product_name, 'latest') for product_name in product_names])
+                provider_products = provider(logger).provide([(product_name, 'latest') for product_name in product_names])
                 resolved_products += provider_products
                 logger.info(f'Resolved {len(provider_products)} products from provider {provider_name}')
         logger.info('Successfully resolved products')
