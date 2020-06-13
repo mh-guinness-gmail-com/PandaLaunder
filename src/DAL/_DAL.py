@@ -37,7 +37,7 @@ class DAL(ABC, metaclass=MetaDAL):
         raise NotImplementedError()
 
     @abstractmethod
-    def add_resolved_product(self, product: Product) -> None:
+    def add_resolved_products(self, products: List[Product]) -> None:
         raise NotImplementedError()
 
     @abstractmethod

@@ -52,12 +52,15 @@ class FS(DAL):
         c_providers.append(provider.to_dict())
         self.__flush()
 
-    def add_resolved_product(self, product):
-        resolved = self.__content['resolved']
-        resolved.append({ 
-            **product.to_dict(),
-            'resolved_on':  str(datetime.now()),
-        })
+    def add_resolved_products(self, products):
+        now = str(datetime.now())
+        self.__content['resolved'] += [
+            {
+                **product.to_dict(),
+                'resolved_on':  now,
+            }
+            for product in products
+        ]
         self.__flush()
 
     def get_providers(self):

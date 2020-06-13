@@ -67,8 +67,7 @@ def main() -> None:
         logger.info('Successfully packaged products')
 
         logger.info('Reporting to DB')
-        for product in resolved_products:
-            db.add_resolved_product(product)
+        db.add_resolved_products(resolved_products)
 
         logger.info('Done')
 

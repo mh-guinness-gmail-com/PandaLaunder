@@ -34,12 +34,16 @@ class MongoDB(DAL):
             raise RuntimeError()
         providers.insert_one(provider.to_dict())
 
-    def add_resolved_product(self, product):
+    def add_resolved_products(self, products):
         resolved = self.__db['resolved']
-        resolved.insert_one({
-            **product.to_dict(),
-            'resolved_on':  str(datetime.now()),
-        })
+        now = str(datetime.now())
+        resolved.insert_many([
+            {
+                **product.to_dict(),
+                'resolved_on':  now,
+            }
+            for product in products
+        ])
 
     def get_providers(self):
         return [ providers[provider['name']] for provider in self.__db['providers'].find() ]
