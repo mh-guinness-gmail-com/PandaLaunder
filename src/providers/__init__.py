@@ -1,19 +1,12 @@
 """The providers module exports all providers.
 It also includes metadata for each provider to assist usage
 """
-from .Npm import Npm
-from .Vscode import Vscode
+from typing import List, Dict
 
 
-providers = [
-    {
-        'name': 'npm',
-        'products': 'npm packages',
-        'class': Npm,
-    },
-    {
-        'name': 'vscode',
-        'products': 'vscode extensions',
-        'class': Vscode,
-    },
-]
+from src.import_util import import_all_public_sibling_modules
+
+from ._Provider import Provider
+
+def get_providers() -> List[Dict]:
+    return import_all_public_sibling_modules(__file__)

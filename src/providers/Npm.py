@@ -3,7 +3,7 @@ import requests
 import semver
 
 
-from .Provider import Provider
+from ._Provider import Provider
 from src.Product import Product
 from src.http_util import validate_http_status_code
 
@@ -12,12 +12,16 @@ NPM_REGISTRY_URL = 'https://registry.npmjs.org'
 
 
 class Npm(Provider):
-    @property
-    def name(self):
+    @staticmethod
+    def _get_name():
         return 'npm'
 
-    @property
-    def file_ext(self):
+    @staticmethod
+    def _get_products():
+        return 'npm packages'
+
+    @staticmethod
+    def _get_file_ext():
         return 'tgz'
 
     def _resolve_product(self, product_name, product_version):
@@ -39,7 +43,7 @@ class Npm(Provider):
         self._logger.info('Resolved npm package {0}@{1} to version {2}'.format(
             product_name, product_version, version))
         download_url = response_payload['versions'][version]['dist']['tarball']
-        return Product(self, product_name, version, download_url)
+        return Product(Npm, product_name, version, download_url)
 
     def _get_dependencies(self, product: Product, *, get_dependencies=True, get_dev_dependencies=False) -> List[Tuple[str, str]]:
         response = requests.get(

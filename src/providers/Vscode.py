@@ -2,7 +2,7 @@ import requests
 import json
 
 
-from .Provider import Provider
+from ._Provider import Provider
 from src.Product import Product
 from src.http_util import validate_http_status_code
 
@@ -39,12 +39,16 @@ class Vscode(Provider):
             'flags': 0x200 + 0x2,  # 0x200 - only latest; 0x2 - include files
         }
 
-    @property
-    def name(self):
+    @staticmethod
+    def _get_name():
         return 'vscode'
 
-    @property
-    def file_ext(self):
+    @staticmethod
+    def _get_products():
+        return 'vscode extensions'
+
+    @staticmethod
+    def _get_file_ext():
         return 'vsix'
 
     def _resolve_product(self, product_name, product_version):
@@ -70,6 +74,6 @@ class Vscode(Provider):
                 _DOWNLOAD_ENDPOINT
             self._logger.info('Resolved vscode extension {0} for vscode version {1} to version {2}'.format(
                 product_name, vscode_version, version))
-            return Product(self, product_name, version, download_url)
+            return Product(Vscode, product_name, version, download_url)
         except Exception as e:
             raise ValueError(product_name, Vscode.__get_vscode_latest()) from e
