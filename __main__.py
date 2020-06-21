@@ -4,11 +4,12 @@ import os
 import logging
 
 from src import packagers, DAL
-from src.command_line import args
+# from src.command_line import args
 from src.providers import get_providers
+from src.config_loader import load_config
 
 
-args_dict = vars(args)
+# args_dict = vars(args)
 providers = { provider.name: provider for provider in get_providers() }
 databases = { db.name: db for db in DAL.get_databases() }
 
@@ -20,10 +21,11 @@ def get_logger(level=logging.DEBUG):
     formatter = logging.Formatter('%(asctime)s\t|\t%(levelname)s\t|\t%(message)s')
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
-    logger.propagate = False    
+    logger.propagate = False
     return logger
 
 def main() -> None:
+    config = load_config()
     logger = get_logger()
     num_workers = args.concurrency * os.cpu_count()
     if not args.strict_ssl:
@@ -41,7 +43,7 @@ def main() -> None:
                 logger.warning(f'Provider {provider} not in database. It will be added')
                 db.add_provider(providers[provider])
         logger.info('Successfully resolved providers')
-        
+
         logger.info('Started resolving products')
         resolved_products = []
         for provider_name in selected_providers:

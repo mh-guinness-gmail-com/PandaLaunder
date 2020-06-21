@@ -15,6 +15,7 @@ str2bool = ">=1.1,<2"
 pymongo = ">=3.10.1,<4"
 pyyaml = ">=5.3.1,<6"
 dnspython = ">=1.16.0,<2"
+omegaconf = "*"
 
 [requires]
 python_version = "3.8"
